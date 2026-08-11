@@ -1,3 +1,4 @@
+# boot device: /dev/disk/by-id/BOOT_DISK_REPLACE_ME
 variant: fcos
 version: 1.7.0
 
@@ -148,11 +149,6 @@ kernel_arguments:
 
 boot_device:
   layout: aarch64
-  luks:
-    device: /dev/disk/by-id/REPLACE_ME
-    tpm2: true
-    threshold: 1
-    discard: false
 
 grub:
   users:
