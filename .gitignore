@@ -1,5 +1,8 @@
 /secrets
 .kube/*
+.env
+.secrets.env
+*.ign
 
 # Terraform
 .terraform/
