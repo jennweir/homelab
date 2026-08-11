@@ -18,12 +18,7 @@ storage:
       partitions:
         - number: 1
           label: VARLIB
-          size_mib: 153600
-          start_mib: 0
-          wipe_partition_entry: true
-        - number: 2
-          label: CEPH
-          size_mib: 0
+          size_mib: 40960
           start_mib: 0
           wipe_partition_entry: true
   filesystems:
