@@ -3,6 +3,8 @@
 .env
 .secrets.env
 *.ign
+installation/k8s/ansible/playbooks/coreos-lab/inventory
+installation/k8s/coreos-lab/output
 
 # Terraform
 .terraform/

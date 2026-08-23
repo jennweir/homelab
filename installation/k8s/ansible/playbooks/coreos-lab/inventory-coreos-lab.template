@@ -1,0 +1,9 @@
+[coreos_lab]
+# Replace these addresses and set the correct private key for this build.
+k8s1 ansible_host=192.168.0.111 ansible_user=core ansible_ssh_private_key_file=~/.ssh/k8s-homelab-YYYYMMDD
+k8s2 ansible_host=192.168.0.112 ansible_user=core ansible_ssh_private_key_file=~/.ssh/k8s-homelab-YYYYMMDD
+k8s3 ansible_host=192.168.0.113 ansible_user=core ansible_ssh_private_key_file=~/.ssh/k8s-homelab-YYYYMMDD
+
+[coreos_lab:vars]
+ansible_become=true
+ansible_python_interpreter=/usr/bin/python3

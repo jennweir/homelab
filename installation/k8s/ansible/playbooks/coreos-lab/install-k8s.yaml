@@ -1,0 +1,137 @@
+---
+- name: Prepare Fedora CoreOS Kubernetes nodes
+  hosts: coreos_lab
+  become: true
+  gather_facts: true
+  serial: 1
+  vars:
+    kubernetes_image_archive: "{{ playbook_dir }}/../../../coreos-lab/output/fcos-kubernetes.ociarchive"
+    remote_image_archive: /var/lib/fcos-kubernetes.ociarchive
+    expected_kubernetes_minor: "1.36"
+
+  pre_tasks:
+    - name: Require Fedora CoreOS
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.distribution == 'Fedora'
+          - ansible_facts.os_family == 'RedHat'
+        fail_msg: This playbook is for Fedora CoreOS nodes only.
+
+    - name: Require an x86_64 node
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.architecture in ['x86_64', 'amd64']
+        fail_msg: The custom image is built for x86_64 nodes.
+
+    - name: Require the custom image archive on the controller
+      ansible.builtin.stat:
+        path: "{{ kubernetes_image_archive }}"
+      delegate_to: localhost
+      become: false
+      register: image_archive
+      run_once: true
+
+    - name: Stop when the custom image archive is missing
+      ansible.builtin.assert:
+        that: image_archive.stat.exists
+        fail_msg: Build the custom FCOS image first and ensure the OCI archive exists.
+      run_once: true
+
+  tasks:
+    - name: Disable active swap
+      ansible.builtin.command: swapoff -a
+      changed_when: false
+
+    - name: Mask swap units
+      ansible.builtin.systemd:
+        name: swap.target
+        masked: true
+
+    - name: Load Kubernetes kernel modules
+      ansible.builtin.copy:
+        dest: /etc/modules-load.d/k8s.conf
+        mode: "0644"
+        content: |
+          overlay
+          br_netfilter
+
+    - name: Load Kubernetes kernel modules
+      ansible.builtin.command: modprobe {{ item }}
+      loop:
+        - overlay
+        - br_netfilter
+      changed_when: false
+
+    - name: Apply Kubernetes sysctls
+      ansible.builtin.command: sysctl --system
+      changed_when: false
+
+    - name: Create CNI directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - /etc/cni/net.d
+        - /opt/cni/bin
+
+    - name: Copy custom Kubernetes FCOS image archive
+      ansible.builtin.copy:
+        src: "{{ kubernetes_image_archive }}"
+        dest: "{{ remote_image_archive }}"
+        mode: "0600"
+      register: image_copy
+
+    - name: Rebase to the custom Kubernetes FCOS image
+      ansible.builtin.command:
+        cmd: >-
+          rpm-ostree rebase
+          ostree-unverified-image:oci-archive:{{ remote_image_archive }}
+      when: image_copy.changed
+      register: rebase_result
+      changed_when: true
+
+    - name: Reboot after image rebase
+      ansible.builtin.reboot:
+        msg: Rebooting into the custom Kubernetes FCOS deployment
+        reboot_timeout: 900
+      when: image_copy.changed
+
+    - name: Enable and start CRI-O
+      ansible.builtin.systemd:
+        name: crio.service
+        enabled: true
+        state: started
+        daemon_reload: true
+
+    - name: Enable kubelet for manual kubeadm bootstrap
+      ansible.builtin.systemd:
+        name: kubelet.service
+        enabled: true
+        state: stopped
+
+    - name: Verify Kubernetes binaries
+      ansible.builtin.shell: "command -v {{ item }}"
+      loop:
+        - kubeadm
+        - kubelet
+        - kubectl
+        - crio
+      changed_when: false
+
+    - name: Verify CRI-O socket
+      ansible.builtin.stat:
+        path: /var/run/crio/crio.sock
+      register: crio_socket
+
+    - name: Require the CRI-O socket
+      ansible.builtin.assert:
+        that: crio_socket.stat.exists
+        fail_msg: CRI-O is installed but its socket was not created.
+
+    - name: Display manual next steps
+      ansible.builtin.debug:
+        msg: >-
+          {{ inventory_hostname }} is prepared. Run kubeadm init on the first
+          control-plane node or kubeadm join on this node. Kubernetes minor
+          stream configured for the image: {{ expected_kubernetes_minor }}.

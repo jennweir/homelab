@@ -5,6 +5,8 @@ set -euo pipefail
 # pass the target disk as the optional second argument, e.g.:
 # ./create-fcos-k8s-iso.sh /dev/disk4
 # ./create-fcos-k8s-iso.sh /dev/disk4 /dev/nvme0n1
+# To simply create the image without writing to a USB device, run:
+# ./create-fcos-k8s-iso.sh which will write the output to installation/k8s/coreos-lab/output/fedora-coreos-k8s.x86_64.iso
 USB_DEVICE="${1:-}"
 DEST_DEVICE="${2:-/dev/nvme0n1}"
 
@@ -12,15 +14,26 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 KEY_SUFFIX="$(date +%Y%m%d)"
 SSH_KEY_FILE="$HOME/.ssh/k8s-homelab-$KEY_SUFFIX"
-INVENTORY_TEMPLATE="$REPO_ROOT/installation/k8s/ansible/playbooks/coreos-lab/inventory-coreos-lab.example"
-INVENTORY_FILE="$REPO_ROOT/installation/k8s/ansible/playbooks/coreos-lab/inventory-coreos-lab"
+INVENTORY_TEMPLATE="$REPO_ROOT/installation/k8s/ansible/playbooks/coreos-lab/inventory-coreos-lab.template"
+INVENTORY_FILE="$REPO_ROOT/installation/k8s/ansible/playbooks/coreos-lab/inventory"
 TEMP_SECRETS_FILE="$(mktemp)"
 trap 'rm -f "$TEMP_SECRETS_FILE"' EXIT
 
-rm -f "$SSH_KEY_FILE" "$SSH_KEY_FILE.pub"
-ssh-keygen -q -t ed25519 -N '' \
-    -C "k8s-homelab-$KEY_SUFFIX" \
-    -f "$SSH_KEY_FILE"
+if [[ -n "$USB_DEVICE" ]]; then
+    rm -f "$SSH_KEY_FILE" "$SSH_KEY_FILE.pub"
+    ssh-keygen -q -t ed25519 -N '' \
+        -C "k8s-homelab-$KEY_SUFFIX" \
+        -f "$SSH_KEY_FILE"
+elif [[ -f "$SSH_KEY_FILE" && -f "$SSH_KEY_FILE.pub" ]]; then
+    echo "reusing SSH key: $SSH_KEY_FILE"
+elif [[ ! -e "$SSH_KEY_FILE" && ! -e "$SSH_KEY_FILE.pub" ]]; then
+    ssh-keygen -q -t ed25519 -N '' \
+        -C "k8s-homelab-$KEY_SUFFIX" \
+        -f "$SSH_KEY_FILE"
+else
+    echo "error: incomplete SSH key pair; refusing to overwrite: $SSH_KEY_FILE" >&2
+    exit 1
+fi
 
 PASSWORD_HASH=$(sed -n "s/^PASSWORD_HASH='\(.*\)'$/\1/p" \
     "$REPO_ROOT/installation/k8s/coreos-lab/.secrets.env")
