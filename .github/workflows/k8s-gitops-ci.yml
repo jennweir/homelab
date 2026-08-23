@@ -1,0 +1,56 @@
+name: ci
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "k8s/**"
+      - "**.yaml"
+      - "**.yml"
+      - "**.sh"
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  k8s-gitops-ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install k8s-gitops-ci
+        env:
+          VERSION: v0.57.5
+        run: |
+          curl -fsSL -o "/tmp/k8s-gitops-ci_${VERSION#v}_linux_amd64.tar.gz" \
+            "https://github.com/ArthurVardevanyan/k8s-gitops-ci/releases/download/${VERSION}/k8s-gitops-ci_${VERSION#v}_linux_amd64.tar.gz"
+          curl -fsSL -o "/tmp/k8s-gitops-ci_${VERSION#v}_checksums.txt" \
+            "https://github.com/ArthurVardevanyan/k8s-gitops-ci/releases/download/${VERSION}/k8s-gitops-ci_${VERSION#v}_checksums.txt"
+          cd /tmp && grep 'linux_amd64' "k8s-gitops-ci_${VERSION#v}_checksums.txt" | sha256sum -c -
+          tar -xzf "k8s-gitops-ci_${VERSION#v}_linux_amd64.tar.gz" k8s-gitops-ci
+          install -m 0755 /tmp/k8s-gitops-ci /usr/local/bin/k8s-gitops-ci
+          k8s-gitops-ci --help >/dev/null
+      # - name: Install k8s-gitops-ci
+      #   run: |
+      #     go install github.com/ArthurVardevanyan/k8s-gitops-ci/cmd/k8s-gitops-ci@v0.57.5
+      #     echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Install lint tooling
+        run: |
+          npm install -g prettier@3
+          npm install -g markdownlint-cli2@latest
+
+      - name: Generate ci bot token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app_id: ${{ secrets.CI_BOT_APP_ID }}
+          private_key: ${{ secrets.CI_BOT_PRIVATE_KEY }}
+
+      - name: Run k8s-gitops-ci
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          k8s-gitops-ci pipeline --url https://github.com/${{ github.repository }} --pr ${{ github.event.pull_request.number }} --comment --verbose
