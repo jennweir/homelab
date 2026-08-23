@@ -26,6 +26,21 @@ From this directory:
 ansible-playbook -i inventory install-k8s.yaml
 ```
 
+## Resetting nodes
+
+To wipe existing kubeadm state (cluster config, etcd, CNI leftovers, iptables
+rules) before reinstalling, run the reset playbook first. It targets all nodes and can use
+use `-l` to scope it:
+
+```bash
+ansible-playbook -i inventory reset-k8s.yaml          # all nodes
+ansible-playbook -i inventory reset-k8s.yaml -l cp1   # just cp1
+ansible-playbook -i inventory install-k8s.yaml        # fresh init afterwards
+```
+
+The `install-k8s` playbook is non-destructive on reruns. Only `reset-k8s.yaml`
+removes cluster state.
+
 The playbook:
 
 - Waits for each node to boot into the custom FCOS deployment. Stock Fedora CoreOS
