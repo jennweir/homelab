@@ -26,7 +26,8 @@ RUN printf '%s\n' \
         cri-o \
         kubeadm \
         kubelet \
-        kubectl && \
+        kubectl \
+        python3 && \
     dnf clean all && \
     rm -rf /var/cache/dnf
 

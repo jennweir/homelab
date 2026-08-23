@@ -29,14 +29,30 @@ ansible-playbook -i inventory install-k8s.yaml
 The playbook:
 
 - Disables swap.
+- Sets persistent node names to `cp1`, `cp2`, and `cp3` from the inventory.
 - Loads Kubernetes kernel modules and sysctls.
 - Copies the custom FCOS OCI archive to each node.
 - Performs the persistent `rpm-ostree` rebase.
 - Reboots nodes one at a time.
 - Starts CRI-O and enables kubelet.
+- Installs the kube-vip static pod manifest for control-plane VIP `192.168.0.201`.
 - Verifies the Kubernetes binaries and CRI-O socket.
+- Initializes the first inventory host and joins the remaining hosts as control planes.
 
-Run `kubeadm init` manually on the first control-plane node, then run `kubeadm join` on the remaining nodes.
+Generate the kube-vip manifest before running the playbook:
+
+```bash
+../../../../../manifests/platform/kube-vip/generate-manifest.sh
+```
+
+The playbook runs `kubeadm init` on the first inventory host, creates a fresh
+control-plane join command with an uploaded certificate key, and runs that join
+on the remaining hosts. The certificate key is kept in Ansible runtime facts
+and is not written to a repository file.
+
+The playbook changes the kube-vip static pod to use
+`/etc/kubernetes/super-admin.conf`, which is available during kubeadm bootstrap, as a workaround for
+<https://github.com/kube-vip/kube-vip/issues/684>.
 
 ## Inventory template
 
