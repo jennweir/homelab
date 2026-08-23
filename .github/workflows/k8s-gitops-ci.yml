@@ -9,7 +9,7 @@ on:
       - "**.sh"
 
 jobs:
-  ci:
+  k8s-gitops-ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,12 +17,17 @@ jobs:
           fetch-depth: 0
 
       - name: Install k8s-gitops-ci
+        env:
+          VERSION: v0.57.5
         run: |
-          # option 1: go install
-          go install github.com/ArthurVardevanyan/k8s-gitops-ci/cmd/k8s-gitops-ci@latest
-
-          # option 2: download release binary
-          # curl -sL <release-url> -o k8s-gitops-ci && chmod +x k8s-gitops-ci
+          curl -fsSL -o "/tmp/k8s-gitops-ci_${VERSION#v}_linux_amd64.tar.gz" \
+            "https://github.com/ArthurVardevanyan/k8s-gitops-ci/releases/download/${VERSION}/k8s-gitops-ci_${VERSION#v}_linux_amd64.tar.gz"
+          curl -fsSL -o "/tmp/k8s-gitops-ci_${VERSION#v}_checksums.txt" \
+            "https://github.com/ArthurVardevanyan/k8s-gitops-ci/releases/download/${VERSION}/k8s-gitops-ci_${VERSION#v}_checksums.txt"
+          cd /tmp && grep 'linux_amd64' "k8s-gitops-ci_${VERSION#v}_checksums.txt" | sha256sum -c -
+          tar -xzf "k8s-gitops-ci_${VERSION#v}_linux_amd64.tar.gz" k8s-gitops-ci
+          install -m 0755 /tmp/k8s-gitops-ci /usr/local/bin/k8s-gitops-ci
+          k8s-gitops-ci --help >/dev/null
 
       - name: Run k8s-gitops-ci
         run: |
