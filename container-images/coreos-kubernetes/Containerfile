@@ -1,0 +1,35 @@
+ARG FCOS_IMAGE=quay.io/fedora/fedora-coreos:stable
+FROM ${FCOS_IMAGE}
+
+ARG KUBERNETES_MINOR=v1.36
+ARG CRIO_MINOR=v1.36
+
+RUN printf '%s\n' \
+    '[kubernetes]' \
+    'name=Kubernetes' \
+    "baseurl=https://pkgs.k8s.io/core:/stable:/${KUBERNETES_MINOR}/rpm/" \
+    'enabled=1' \
+    'gpgcheck=1' \
+    "gpgkey=https://pkgs.k8s.io/core:/stable:/${KUBERNETES_MINOR}/rpm/repodata/repomd.xml.key" \
+    > /etc/yum.repos.d/kubernetes.repo && \
+    printf '%s\n' \
+    '[cri-o]' \
+    'name=CRI-O' \
+    "baseurl=https://download.opensuse.org/repositories/isv:/cri-o:/stable:/${CRIO_MINOR}/rpm/" \
+    'enabled=1' \
+    'gpgcheck=1' \
+    "gpgkey=https://download.opensuse.org/repositories/isv:/cri-o:/stable:/${CRIO_MINOR}/rpm/repodata/repomd.xml.key" \
+    > /etc/yum.repos.d/cri-o.repo && \
+    dnf install -y --setopt=install_weak_deps=False \
+        container-selinux \
+        containernetworking-plugins \
+        cri-o \
+        kubeadm \
+        kubelet \
+        kubectl \
+        python3 && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf
+
+RUN systemctl enable crio.service kubelet.service && \
+    systemctl mask zincati.service

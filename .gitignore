@@ -1,5 +1,8 @@
 /secrets
 .kube/*
+.env
+.secrets.env
+*.ign
 
 # Terraform
 .terraform/
@@ -20,3 +23,6 @@ credentials.json
 *.pem
 
 .DS_Store
+
+# temporary files related to installation or building images
+k8s/installation/*/output
