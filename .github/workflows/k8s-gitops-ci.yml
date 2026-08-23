@@ -37,6 +37,11 @@ jobs:
       #     go install github.com/ArthurVardevanyan/k8s-gitops-ci/cmd/k8s-gitops-ci@v0.57.5
       #     echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
+      - name: Install lint tooling
+        run: |
+          npm install -g prettier@3
+          npm install -g markdownlint-cli2@latest
+
       - name: Run k8s-gitops-ci
         env:
           GH_TOKEN: ${{ github.token }}
