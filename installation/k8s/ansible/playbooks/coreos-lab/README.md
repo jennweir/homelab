@@ -26,6 +26,19 @@ From this directory:
 ansible-playbook -i inventory install-k8s.yaml
 ```
 
+## Install Cilium
+
+After the cluster is initialized, install the CNI:
+
+```bash
+ansible-playbook -i inventory install-cilium.yaml
+```
+
+The playbook copies `manifests/platform/cilium/cilium2.yaml` to each node,
+applies it once to the cluster from the first control plane node, and waits
+for the Cilium DaemonSet to roll out. It is safe to rerun. Regenerate
+`cilium2.yaml` with `generate-manifest.sh` after changing Helm values.
+
 ## Resetting nodes
 
 To wipe existing kubeadm state (cluster config, etcd, CNI leftovers, iptables
