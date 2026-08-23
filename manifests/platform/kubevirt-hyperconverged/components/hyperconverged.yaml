@@ -1,8 +1,0 @@
-pre-commit run yamllint --all-files --fixkind: HyperConverged
-apiVersion: hco.kubevirt.io/v1beta1
-metadata:
-  annotations:
-    deployOVS: 'false'
-  name: kubevirt-hyperconverged
-  namespace: kubevirt-hyperconverged
-spec: {}
