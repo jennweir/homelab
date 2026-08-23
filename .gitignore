@@ -3,8 +3,6 @@
 .env
 .secrets.env
 *.ign
-installation/k8s/ansible/playbooks/coreos-lab/inventory
-installation/k8s/coreos-lab/output
 
 # Terraform
 .terraform/
@@ -25,3 +23,6 @@ credentials.json
 *.pem
 
 .DS_Store
+
+# temporary files related to installation or building images
+k8s/installation/*/output
