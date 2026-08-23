@@ -1,0 +1,28 @@
+name: k8s-gitops-ci
+on:
+  pull_request:
+    paths:
+      - "kubernetes/**"
+      - "**.yaml"
+      - "**.yml"
+      - "**.sh"
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install k8s-gitops-ci
+        run: |
+          # option 1: go install
+          go install github.com/ArthurVardevanyan/k8s-gitops-ci/cmd/k8s-gitops-ci@latest
+
+          # option 2: download release binary
+          # curl -sL <release-url> -o k8s-gitops-ci && chmod +x k8s-gitops-ci
+
+      - name: Run k8s-gitops-ci
+        run: |
+          k8s-gitops-ci pipeline --url https://github.com/${{ github.repository }} --pr ${{ github.event.pull_request.number }} --comment --verbose
