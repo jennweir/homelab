@@ -1,8 +1,9 @@
 name: k8s-gitops-ci
 on:
   pull_request:
+    branches: [main]
     paths:
-      - "kubernetes/**"
+      - "k8s/**"
       - "**.yaml"
       - "**.yml"
       - "**.sh"
