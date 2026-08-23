@@ -28,11 +28,18 @@ ansible-playbook -i inventory install-k8s.yaml
 
 The playbook:
 
+- Waits for each node to boot into the custom FCOS deployment. Stock Fedora CoreOS
+  ships without Python, so the first play uses `raw` to poll for `/usr/bin/python3`,
+  which only exists after the node rebases into the custom image and reboots.
+  The installer media stages that rebase on first boot and reboots automatically,
+  so freshly installed nodes are usually ready within a few minutes.
 - Disables swap.
 - Sets persistent node names to `cp1`, `cp2`, and `cp3` from the inventory.
 - Loads Kubernetes kernel modules and sysctls.
 - Copies the custom FCOS OCI archive to each node.
-- Performs the persistent `rpm-ostree` rebase.
+- Performs the persistent `rpm-ostree` rebase with `--bypass-driver`; the custom
+  image masks `zincati.service`, which otherwise blocks manual deployments on
+  Fedora CoreOS nodes.
 - Reboots nodes one at a time.
 - Starts CRI-O and enables kubelet.
 - Installs the kube-vip static pod manifest for control-plane VIP `192.168.0.201`.

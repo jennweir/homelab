@@ -31,4 +31,5 @@ RUN printf '%s\n' \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
-RUN systemctl enable crio.service kubelet.service
+RUN systemctl enable crio.service kubelet.service && \
+    systemctl mask zincati.service

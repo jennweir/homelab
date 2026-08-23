@@ -62,28 +62,13 @@ storage:
 
 systemd:
   units:
-    - name: sys-fs-bpf.mount
-      enabled: true
-      contents: |
-        [Unit]
-        Description=Mount BPF Filesystem for Cilium eBPF
-        DefaultDependencies=no
-        Before=local-fs.target
-        [Mount]
-        What=bpffs
-        Where=/sys/fs/bpf
-        Type=bpf
-        Options=rw,nosuid,nodev,noexec,relatime
-        [Install]
-        WantedBy=local-fs.target
-
     - name: kubelet.service
       dropins:
         - name: 10-kubernetes.conf
           contents: |
             [Unit]
-            Requires=crio.service sys-fs-bpf.mount
-            After=crio.service sys-fs-bpf.mount
+            Requires=crio.service
+            After=crio.service
       enabled: false
 
     - name: kubernetes-prerequisites.service

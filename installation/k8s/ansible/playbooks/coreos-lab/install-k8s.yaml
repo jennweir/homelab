@@ -1,4 +1,16 @@
 ---
+- name: Wait for nodes to boot into the custom FCOS deployment
+  hosts: coreos_lab
+  gather_facts: false
+  tasks:
+    - name: Wait for /usr/bin/python3 from the custom image
+      ansible.builtin.raw: test -x /usr/bin/python3
+      register: python_check
+      until: python_check.rc == 0
+      retries: 40
+      delay: 15
+      changed_when: false
+
 - name: Prepare Fedora CoreOS Kubernetes nodes
   hosts: coreos_lab
   become: true
@@ -9,9 +21,6 @@
     kube_vip_manifest: "{{ playbook_dir }}/../../../../../manifests/platform/kube-vip/kube-vip.yaml"
     remote_image_archive: /var/lib/fcos-kubernetes.ociarchive
     expected_kubernetes_minor: "1.36"
-    control_plane_endpoint: 192.168.0.201:6443
-    pod_network_cidr: 10.200.0.0/16
-
   pre_tasks:
     - name: Require Fedora CoreOS
       ansible.builtin.assert:
@@ -100,13 +109,13 @@
       ansible.builtin.copy:
         src: "{{ kubernetes_image_archive }}"
         dest: "{{ remote_image_archive }}"
-        mode: "0600"
+        mode: "0644"
       register: image_copy
 
     - name: Rebase to the custom Kubernetes FCOS image
       ansible.builtin.command:
         cmd: >-
-          rpm-ostree rebase
+          rpm-ostree rebase --bypass-driver
           ostree-unverified-image:oci-archive:{{ remote_image_archive }}
       when: image_copy.changed
       register: rebase_result
@@ -117,6 +126,25 @@
         msg: Rebooting into the custom Kubernetes FCOS deployment
         reboot_timeout: 900
       when: image_copy.changed
+
+    - name: Wait for node to come back from reboot
+      ansible.builtin.wait_for_connection:
+        timeout: 900
+      when: image_copy.changed
+
+    - name: Confirm custom image is active after reboot
+      ansible.builtin.command: test -x /usr/bin/python3
+      changed_when: false
+      when: image_copy.changed
+
+    - name: kubelet depends on CRI-O
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/kubelet.service.d/10-kubernetes.conf
+        mode: "0644"
+        content: |
+          [Unit]
+          Requires=crio.service
+          After=crio.service
 
     - name: Enable and start CRI-O
       ansible.builtin.systemd:
@@ -175,6 +203,10 @@
   become: true
   gather_facts: false
   serial: 1
+  vars:
+    expected_kubernetes_minor: "1.36"
+    control_plane_endpoint: 192.168.0.201:6443
+    pod_network_cidr: 10.200.0.0/16
   tasks:
     - name: Check whether the first control plane is already initialized
       ansible.builtin.stat:
