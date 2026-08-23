@@ -1,4 +1,4 @@
-# boot device: /dev/disk/by-id/BOOT_DISK_REPLACE_ME
+# Install CoreOS to the NVMe device with coreos-installer; leave both SATA SSDs untouched.
 variant: fcos
 version: 1.7.0
 
@@ -13,30 +13,6 @@ ignition:
       certificate_authorities: []
 
 storage:
-  disks:
-    - device: /dev/disk/by-id/DATA_DISK_REPLACE_ME
-      wipe_table: true
-      partitions:
-        - number: 1
-          label: VARLIB
-          size_mib: 153600
-          start_mib: 0
-          wipe_partition_entry: true
-        - number: 2
-          label: CEPH
-          size_mib: 0
-          start_mib: 0
-          wipe_partition_entry: true
-  filesystems:
-    - device: /dev/disk/by-partlabel/VARLIB
-      format: ext4
-      label: VARLIB
-      path: /var/lib
-      options:
-        - -T
-        - small
-      wipe_filesystem: true
-      with_mount_unit: true
   files:
     - path: /etc/modules-load.d/k8s.conf
       mode: 0644
@@ -51,6 +27,15 @@ storage:
           net.bridge.bridge-nf-call-iptables = 1
           net.bridge.bridge-nf-call-ip6tables = 1
           net.ipv4.ip_forward = 1
+    - path: /etc/crio/crio.conf.d/10-kubernetes.conf
+      mode: 0644
+      contents:
+        inline: |
+          [crio.runtime]
+          cgroup_manager = "systemd"
+          conmon_cgroup = "pod"
+          [crio.image]
+          pause_image = "registry.k8s.io/pause:3.10"
     - path: /etc/kubernetes/kubelet.yaml
       mode: 0644
       contents:
@@ -68,26 +53,15 @@ storage:
           clusterDomain: cluster.local
           resolvConf: /run/systemd/resolve/resolv.conf
           rotateCertificates: true
-  directories: []
+  directories:
+    - path: /etc/cni/net.d
+      mode: 0755
+    - path: /opt/cni/bin
+      mode: 0755
   links: []
 
 systemd:
   units:
-    - name: restorecon-var-lib.service
-      enabled: true
-      contents: |
-        [Unit]
-        Description=Relabel /var/lib for SELinux
-        Requires=var-lib.mount
-        After=var-lib.mount
-        Before=crio.service kubelet.service
-        [Service]
-        Type=oneshot
-        ExecStart=/usr/sbin/restorecon -R /var/lib
-        RemainAfterExit=yes
-        [Install]
-        WantedBy=multi-user.target
-
     - name: sys-fs-bpf.mount
       enabled: true
       contents: |
@@ -103,35 +77,30 @@ systemd:
         [Install]
         WantedBy=local-fs.target
 
-    - name: crio.service
-      enabled: true
-      contents: |
-        [Unit]
-        Description=CRI-O Container Runtime
-        Documentation=https://github.com/cri-o/cri-o
-        Requires=var-lib.mount
-        After=network.target local-fs.target var-lib.mount
-        [Service]
-        Type=notify
-        ExecStart=/usr/bin/crio
-        ExecReload=/bin/kill -HUP $MAINPID
-        Restart=always
-        RestartSec=10
-        [Install]
-        WantedBy=multi-user.target
-
     - name: kubelet.service
+      dropins:
+        - name: 10-kubernetes.conf
+          contents: |
+            [Unit]
+            Requires=crio.service sys-fs-bpf.mount
+            After=crio.service sys-fs-bpf.mount
+      enabled: false
+
+    - name: kubernetes-prerequisites.service
       enabled: true
       contents: |
         [Unit]
-        Description=kubelet: The Kubernetes Node Agent
-        Documentation=https://kubernetes.io
-        Requires=crio.service sys-fs-bpf.mount
-        After=crio.service sys-fs-bpf.mount
+        Description=Validate Kubernetes node prerequisites
+        After=network-online.target
+        Wants=network-online.target
+        Before=kubelet.service
         [Service]
-        ExecStart=/usr/bin/kubelet --config=/etc/kubernetes/kubelet.yaml --kubeconfig=/etc/kubernetes/kubelet.conf --container-runtime-endpoint=unix:///var/run/crio/crio.sock
-        Restart=always
-        RestartSec=10
+        Type=oneshot
+        ExecStart=/usr/bin/test -x /usr/bin/kubeadm
+        ExecStart=/usr/bin/test -x /usr/bin/kubelet
+        ExecStart=/usr/bin/test -x /usr/bin/kubectl
+        ExecStart=/usr/bin/test -x /usr/bin/crio
+        RemainAfterExit=yes
         [Install]
         WantedBy=multi-user.target
 

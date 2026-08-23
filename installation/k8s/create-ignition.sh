@@ -20,7 +20,7 @@ case "${1:-}" in
     ;;
 esac
 
-SECRETS_FILE="$SCRIPT_DIR/$dir/.secrets.env"
+SECRETS_FILE="${SECRETS_FILE:-$SCRIPT_DIR/$dir/.secrets.env}"
 if [[ ! -f "$SECRETS_FILE" ]]; then
   echo "error: missing $SECRETS_FILE (copy $dir/.secrets.env.example and fill in values)" >&2
   exit 1

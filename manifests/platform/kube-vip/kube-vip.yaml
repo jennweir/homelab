@@ -22,12 +22,14 @@ spec:
       value: "32"
     - name: dns_mode
       value: first
+    - name: dhcp_mode
+      value: ipv4
     - name: cp_enable
       value: "true"
     - name: cp_namespace
       value: kube-system
     - name: svc_enable
-      value: "true"
+      value: "false"
     - name: svc_leasename
       value: plndr-svcs-lock
     - name: vip_leaderelection
@@ -35,16 +37,16 @@ spec:
     - name: vip_leasename
       value: plndr-cp-lock
     - name: vip_leaseduration
-      value: "5"
+      value: "15"
     - name: vip_renewdeadline
-      value: "3"
+      value: "10"
     - name: vip_retryperiod
-      value: "1"
+      value: "2"
     - name: address
       value: 192.168.0.201
     - name: prometheus_server
       value: :2112
-    image: ghcr.io/kube-vip/kube-vip:v1.0.2
+    image: ghcr.io/kube-vip/kube-vip:v1.2.3
     imagePullPolicy: IfNotPresent
     name: kube-vip
     resources: {}
