@@ -1,4 +1,4 @@
-name: k8s-gitops-ci
+name: ci
 on:
   pull_request:
     branches: [main]
@@ -7,6 +7,10 @@ on:
       - "**.yaml"
       - "**.yml"
       - "**.sh"
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   k8s-gitops-ci:
@@ -28,7 +32,13 @@ jobs:
           tar -xzf "k8s-gitops-ci_${VERSION#v}_linux_amd64.tar.gz" k8s-gitops-ci
           install -m 0755 /tmp/k8s-gitops-ci /usr/local/bin/k8s-gitops-ci
           k8s-gitops-ci --help >/dev/null
+      # - name: Install k8s-gitops-ci
+      #   run: |
+      #     go install github.com/ArthurVardevanyan/k8s-gitops-ci/cmd/k8s-gitops-ci@v0.57.5
+      #     echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
       - name: Run k8s-gitops-ci
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           k8s-gitops-ci pipeline --url https://github.com/${{ github.repository }} --pr ${{ github.event.pull_request.number }} --comment --verbose
