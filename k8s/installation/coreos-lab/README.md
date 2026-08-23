@@ -4,11 +4,14 @@ This playbook prepares Fedora CoreOS x86_64 nodes for a Kubernetes cluster using
 
 ## Prerequisites
 
-Build the custom FCOS image and OCI archive first:
+Build the ignition file, custom FCOS image, and OCI archive first:
 
 ```bash
-./create-fcos-k8s-iso.sh
+../create-ignition.sh lab
+./create-fcos-k8s-iso.sh /dev/disk4 # check USB device name before writing to it
 ```
+
+Insert USB into each node. Boot into live media. Power off. Remove USB. Boot into newly installed CoreOS. Take note of the IP address for each node once it comes up.
 
 The script creates the dated SSH key and generates `ansible-playbooks/inventory`.
 
@@ -30,7 +33,7 @@ After the cluster is initialized, install the CNI:
 ansible-playbook -i inventory install-cilium.yaml
 ```
 
-The playbook copies `manifests/platform/cilium/cilium.yaml` to each node,
+The playbook copies `manifests/platform/cilium/lab/cilium.yaml` to each node,
 applies it once to the cluster from the first control plane node, and waits
 for the Cilium DaemonSet to roll out. It is safe to rerun. Regenerate
 `cilium.yaml` with `generate-manifest.sh` after changing Helm values.
