@@ -17,7 +17,7 @@ spec:
         fieldRef:
           fieldPath: spec.nodeName
     - name: vip_interface
-      value: eth0
+      value: eno1
     - name: vip_subnet
       value: "32"
     - name: dns_mode

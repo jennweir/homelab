@@ -224,6 +224,13 @@
       when: inventory_hostname == groups['coreos_lab'][0] and not admin_conf_pre.stat.exists
       register: kubeadm_init
 
+    - name: Revert kube-vip to the admin kubeconfig after initialization
+      ansible.builtin.replace:
+        path: /etc/kubernetes/manifests/kube-vip.yaml
+        regexp: /etc/kubernetes/super-admin\.conf
+        replace: /etc/kubernetes/admin.conf
+      when: inventory_hostname == groups['coreos_lab'][0] and not (kubeadm_init.skipped | default(false))
+
     - name: Re-check admin.conf after potential initialization
       ansible.builtin.stat:
         path: /etc/kubernetes/admin.conf

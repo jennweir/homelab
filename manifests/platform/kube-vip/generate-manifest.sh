@@ -7,7 +7,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUTPUT_FILE="$SCRIPT_DIR/kube-vip.yaml"
 KVVERSION="v1.2.3"
 VIP="192.168.0.201"
-INTERFACE="eth0"
+INTERFACE="eno1"
 TEMP_FILE="$(mktemp)"
 NORMALIZED_FILE="$(mktemp)"
 trap 'rm -f "$TEMP_FILE" "$NORMALIZED_FILE"' EXIT
