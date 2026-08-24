@@ -38,6 +38,12 @@ applies it once to the cluster from the first control plane node, and waits
 for the Cilium DaemonSet to roll out. It is safe to rerun. Regenerate
 `cilium.yaml` with `generate-manifest.sh` after changing Helm values.
 
+## Mark Nodes as Scheduleable Workers
+
+Once, all control plane nodes are `Ready`, label as workers to enable scheduling workloads.
+
+`kubectl apply -f k8s/manifests/platform/nodes/lab/nodes.yaml`
+
 ## Resetting nodes
 
 To wipe existing kubeadm state (cluster config, etcd, CNI leftovers, iptables
