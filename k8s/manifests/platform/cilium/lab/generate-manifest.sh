@@ -6,10 +6,16 @@ set -o pipefail
 helm repo add cilium https://helm.cilium.io/
 helm repo update
 
-helm template cilium cilium/cilium \
-    --version 1.20.0 \
+# Cilium default
+# helm template cilium cilium/cilium --version 1.20.0 \
+#     --namespace kube-system \
+#     > cilium.yaml
+
+# Cilium as a gateway-api provider
+helm template cilium cilium/cilium --version 1.20.0 \
     --namespace kube-system \
-    > cilium.yaml
+    --set kubeProxyReplacement=true \
+    --set gatewayAPI.enabled=true > cilium.yaml
 
 if command -v gsed >/dev/null 2>&1; then
     SED="gsed"
