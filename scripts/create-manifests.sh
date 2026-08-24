@@ -5,17 +5,30 @@ set -o pipefail
 shopt -s failglob
 
 if [[ $# -ne 1 ]]; then
-  echo "Usage: $0 <manifest-url>"
+  echo "Usage: $0 <manifest-url-or-file>"
   exit 1
 fi
 
-MANIFESTURL="$1"
+MANIFESTSOURCE="$1"
 
-mkdir -p base
-pushd base > /dev/null || exit 1
+# Resolve local files to absolute paths before descending into base/
+if [[ -f "${MANIFESTSOURCE}" && "${MANIFESTSOURCE}" != /* ]]; then
+  MANIFESTSOURCE="${PWD}/${MANIFESTSOURCE}"
+fi
 
-# Download manifests and separate into separate files
-curl -sL "${MANIFESTURL}" | \
+fetch() {
+  if [[ -f "${MANIFESTSOURCE}" ]]; then
+    cat -- "${MANIFESTSOURCE}"
+  else
+    curl -fsSL -- "${MANIFESTSOURCE}"
+  fi
+}
+
+mkdir -p staging
+pushd staging > /dev/null || exit 1
+
+# Download/read manifests and separate into separate files
+fetch | \
   yq --no-colors --prettyPrint '... comments=""' | \
   kubectl-slice -o . --template "{{ .kind | lower }}.yaml"
 
