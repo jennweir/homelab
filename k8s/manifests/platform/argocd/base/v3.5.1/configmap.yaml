@@ -27,15 +27,13 @@ data:
   resource.customizations.ignoreResourceUpdates.argoproj.io_Rollout: |
     jqPathExpressions:
       - '.metadata.annotations."notified.notifications.argoproj.io"'
-  resource.customizations.ignoreResourceUpdates.autoscaling_HorizontalPodAutoscaler:
-    |
+  resource.customizations.ignoreResourceUpdates.autoscaling_HorizontalPodAutoscaler: |
     jqPathExpressions:
       - '.metadata.annotations."autoscaling.alpha.kubernetes.io/behavior"'
       - '.metadata.annotations."autoscaling.alpha.kubernetes.io/conditions"'
       - '.metadata.annotations."autoscaling.alpha.kubernetes.io/metrics"'
       - '.metadata.annotations."autoscaling.alpha.kubernetes.io/current-metrics"'
-  resource.customizations.ignoreResourceUpdates.discovery.k8s.io_EndpointSlice:
-    |
+  resource.customizations.ignoreResourceUpdates.discovery.k8s.io_EndpointSlice: |
     jsonPointers:
       - /metadata
       - /endpoints
@@ -101,6 +99,7 @@ metadata:
     app.kubernetes.io/name: argocd-cm
     app.kubernetes.io/part-of: argocd
   name: argocd-cm
+  namespace: argocd
 ---
 apiVersion: v1
 data:
@@ -111,6 +110,7 @@ metadata:
     app.kubernetes.io/name: argocd-cmd-params-cm
     app.kubernetes.io/part-of: argocd
   name: argocd-cmd-params-cm
+  namespace: argocd
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -119,6 +119,7 @@ metadata:
     app.kubernetes.io/name: argocd-gpg-keys-cm
     app.kubernetes.io/part-of: argocd
   name: argocd-gpg-keys-cm
+  namespace: argocd
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -128,6 +129,7 @@ metadata:
     app.kubernetes.io/name: argocd-notifications-controller
     app.kubernetes.io/part-of: argocd
   name: argocd-notifications-cm
+  namespace: argocd
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -136,6 +138,7 @@ metadata:
     app.kubernetes.io/name: argocd-rbac-cm
     app.kubernetes.io/part-of: argocd
   name: argocd-rbac-cm
+  namespace: argocd
 ---
 apiVersion: v1
 data:
@@ -861,6 +864,7 @@ metadata:
     app.kubernetes.io/name: argocd-redis-ha
     app.kubernetes.io/part-of: argocd
   name: argocd-redis-ha-configmap
+  namespace: argocd
 ---
 apiVersion: v1
 data:
@@ -933,6 +937,7 @@ metadata:
     app.kubernetes.io/name: argocd-redis-ha
     app.kubernetes.io/part-of: argocd
   name: argocd-redis-ha-health-configmap
+  namespace: argocd
 ---
 apiVersion: v1
 data:
@@ -958,6 +963,7 @@ metadata:
     app.kubernetes.io/name: argocd-ssh-known-hosts-cm
     app.kubernetes.io/part-of: argocd
   name: argocd-ssh-known-hosts-cm
+  namespace: argocd
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -966,3 +972,4 @@ metadata:
     app.kubernetes.io/name: argocd-tls-certs-cm
     app.kubernetes.io/part-of: argocd
   name: argocd-tls-certs-cm
+  namespace: argocd

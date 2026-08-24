@@ -6,6 +6,7 @@ metadata:
     app.kubernetes.io/name: argocd-application-controller
     app.kubernetes.io/part-of: argocd
   name: argocd-application-controller
+  namespace: argocd
 rules:
   - apiGroups:
       - ""
@@ -54,6 +55,7 @@ metadata:
     app.kubernetes.io/name: argocd-applicationset-controller
     app.kubernetes.io/part-of: argocd
   name: argocd-applicationset-controller
+  namespace: argocd
 rules:
   - apiGroups:
       - argoproj.io
@@ -129,6 +131,7 @@ metadata:
     app.kubernetes.io/name: argocd-dex-server
     app.kubernetes.io/part-of: argocd
   name: argocd-dex-server
+  namespace: argocd
 rules:
   - apiGroups:
       - ""
@@ -148,6 +151,7 @@ metadata:
     app.kubernetes.io/name: argocd-notifications-controller
     app.kubernetes.io/part-of: argocd
   name: argocd-notifications-controller
+  namespace: argocd
 rules:
   - apiGroups:
       - argoproj.io
@@ -193,6 +197,7 @@ metadata:
     app.kubernetes.io/name: argocd-redis-ha
     app.kubernetes.io/part-of: argocd
   name: argocd-redis-ha
+  namespace: argocd
 rules:
   - apiGroups:
       - ""
@@ -209,6 +214,7 @@ metadata:
     app.kubernetes.io/name: argocd-redis-ha
     app.kubernetes.io/part-of: argocd
   name: argocd-redis-ha-haproxy
+  namespace: argocd
 rules:
   - apiGroups:
       - ""
@@ -239,6 +245,7 @@ metadata:
     app.kubernetes.io/name: argocd-server
     app.kubernetes.io/part-of: argocd
   name: argocd-server
+  namespace: argocd
 rules:
   - apiGroups:
       - ""

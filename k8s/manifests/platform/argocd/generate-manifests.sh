@@ -24,18 +24,38 @@ echo "Creating manifests..."
 
 echo "Setting namespace '${NAMESPACE}' on namespaced resources..."
 
-for file in "${OUTPUT_DIR}"/*.yaml; do
-    kind="$(yq eval '.kind // ""' "${file}")"
+echo "Setting namespace '${NAMESPACE}' on namespaced resources..."
 
-    case "${kind}" in
-        Namespace|CustomResourceDefinition|ClusterRole|ClusterRoleBinding)
-            echo "Skipping namespace for ${kind}: $(basename "${file}")"
-            yq eval -i 'del(.metadata.namespace)' "${file}"
-            ;;
-        *)
-            yq eval -i '.metadata.namespace = strenv(NAMESPACE)' "${file}"
-            ;;
-    esac
+echo "Setting namespace '${NAMESPACE}' on namespaced resources..."
+
+for file in "${OUTPUT_DIR}"/*.yaml; do
+    filename="$(basename "${file}")"
+
+    if [[ "${filename}" == "kustomization.yaml" ]]; then
+        continue
+    fi
+
+    yq eval -i '
+        with(
+            select(
+                .kind == "Namespace" or
+                .kind == "CustomResourceDefinition" or
+                .kind == "ClusterRole" or
+                .kind == "ClusterRoleBinding"
+            );
+            del(.metadata.namespace)
+        )
+        |
+        with(
+            select(
+                .kind != "Namespace" and
+                .kind != "CustomResourceDefinition" and
+                .kind != "ClusterRole" and
+                .kind != "ClusterRoleBinding"
+            );
+            .metadata.namespace = strenv(NAMESPACE)
+        )
+    ' "${file}"
 done
 
 echo "Creating namespace.yaml..."
