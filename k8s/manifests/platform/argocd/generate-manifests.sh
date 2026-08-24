@@ -93,4 +93,6 @@ for file in "${OUTPUT_DIR}"/*.yaml; do
     echo "  - ${filename}" >> "${OUTPUT_DIR}/kustomization.yaml"
 done
 
+prettier --write "${OUTPUT_DIR}/configmap.yaml"
+
 echo "Generated manifests in ${OUTPUT_DIR}"
