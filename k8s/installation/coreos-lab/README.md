@@ -33,7 +33,7 @@ After the cluster is initialized, install the CNI:
 ansible-playbook -i inventory install-cilium.yaml
 ```
 
-The playbook copies `manifests/platform/cilium/lab/cilium.yaml` to each node,
+The playbook copies `manifests/platform/cilium/overlays/lab/cilium.yaml` to each node,
 applies it once to the cluster from the first control plane node, and waits
 for the Cilium DaemonSet to roll out. It is safe to rerun. Regenerate
 `cilium.yaml` with `generate-manifest.sh` after changing Helm values.
