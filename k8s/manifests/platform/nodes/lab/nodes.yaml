@@ -17,7 +17,7 @@ metadata:
 spec:
   podCIDR: 172.16.0.0/24
   podCIDRs:
-  - 172.16.0.0/24
+    - 172.16.0.0/24
   taints: []
 ---
 apiVersion: v1
@@ -39,7 +39,7 @@ metadata:
 spec:
   podCIDR: 172.16.1.0/24
   podCIDRs:
-  - 172.16.1.0/24
+    - 172.16.1.0/24
   taints: []
 ---
 apiVersion: v1
@@ -61,5 +61,5 @@ metadata:
 spec:
   podCIDR: 172.16.2.0/24
   podCIDRs:
-  - 172.16.2.0/24
+    - 172.16.2.0/24
   taints: []
