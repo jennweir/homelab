@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base/v3.5.1
+  - ../../applications
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/source/path
+        value: k8s/manifests/platform/argocd/overlays/lab
+    target:
+      kind: Application
+      name: argocd

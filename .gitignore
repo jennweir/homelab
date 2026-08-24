@@ -26,3 +26,6 @@ credentials.json
 
 # temporary files related to installation or building images
 k8s/installation/*/output
+
+# create-manifests.sh staging output
+staging/
