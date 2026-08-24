@@ -32,11 +32,16 @@ fetch | \
   yq --no-colors --prettyPrint '... comments=""' | \
   kubectl-slice -o . --template "{{ .kind | lower }}.yaml"
 
-# Split the deployment up
-kubectl-slice -o . --template "{{ .kind | lower }}-{{ .metadata.name | lower }}.yaml" < deployment.yaml
-rm deployment.yaml
+# if there is no deployment, skip it. otherwise, split the deployment up
+if [[ ! -f "deployment.yaml" ]]; then
+  echo "No deployment found in manifests, skipping kustomize"
+else
+  # Split the deployment up
+  kubectl-slice -o . --template "{{ .kind | lower }}-{{ .metadata.name | lower }}.yaml" < deployment.yaml
+  rm deployment.yaml
 
-kustomize create --autodetect
+  kustomize create --autodetect
+fi
 
 # Format YAML
 prettier . --write
