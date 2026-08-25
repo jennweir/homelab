@@ -3,7 +3,7 @@ kind: ClusterRole
 metadata:
   name: system:controller:operator-lifecycle-manager
   annotations:
-    gitops-ci.k8s.io/exempt-rbac-wildcards: "true"
+    gitops-ci.k8s.io/exempt-rbac-wildcards: "apiGroups, resources, nonResourceURLs, verbs"
 rules:
   - apiGroups:
       - "*"
