@@ -3,6 +3,8 @@ kind: ClusterServiceVersion
 metadata:
   name: packageserver
   namespace: olm
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   labels:
     olm.version: v0.46.0
 spec:
