@@ -24,9 +24,9 @@ spec:
       serviceAccountName: olm-operator-serviceaccount
       enableServiceLinks: false
       restartPolicy: Always
-      schedulerName: default
+      schedulerName: default-scheduler
       dnsPolicy: ClusterFirst
-      automountServiceAccountToken: false
+      automountServiceAccountToken: true
       volumes:
         - name: tmpfs
           emptyDir: {}
