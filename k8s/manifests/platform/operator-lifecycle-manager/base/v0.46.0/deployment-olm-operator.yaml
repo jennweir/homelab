@@ -60,12 +60,12 @@ spec:
           livenessProbe:
             httpGet:
               path: /healthz
-              port: 8080
+              port: metrics
               scheme: HTTP
           readinessProbe:
             httpGet:
               path: /healthz
-              port: 8080
+              port: metrics
               scheme: HTTP
           terminationMessagePolicy: FallbackToLogsOnError
           env:
