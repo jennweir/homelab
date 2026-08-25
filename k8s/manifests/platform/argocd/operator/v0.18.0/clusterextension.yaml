@@ -9,3 +9,10 @@ spec:
     catalog:
       packageName: argocd-operator
       version: 0.18.0
+  config:
+    configType: Inline
+    inline:
+      deploymentConfig:
+        env:
+          - name: ARGOCD_CLUSTER_CONFIG_NAMESPACES
+            value: "argocd"
