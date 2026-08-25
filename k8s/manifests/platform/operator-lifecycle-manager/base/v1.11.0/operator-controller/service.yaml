@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    olm.operatorframework.io/feature-set: standard
+  labels:
+    app.kubernetes.io/name: catalogd
+    app.kubernetes.io/part-of: olm
+  name: catalogd-service
+  namespace: olmv1-system
+spec:
+  ports:
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: 8443
+    - name: webhook
+      port: 9443
+      protocol: TCP
+      targetPort: 9443
+    - name: metrics
+      port: 7443
+      protocol: TCP
+      targetPort: 7443
+  selector:
+    app.kubernetes.io/name: catalogd
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    olm.operatorframework.io/feature-set: standard
+  labels:
+    app.kubernetes.io/name: operator-controller
+    app.kubernetes.io/part-of: olm
+  name: operator-controller-service
+  namespace: olmv1-system
+spec:
+  ports:
+    - name: metrics
+      port: 8443
+      protocol: TCP
+      targetPort: 8443
+  selector:
+    app.kubernetes.io/name: operator-controller

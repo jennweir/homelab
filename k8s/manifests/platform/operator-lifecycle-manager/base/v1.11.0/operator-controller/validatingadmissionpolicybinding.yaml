@@ -1,0 +1,13 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: clusterextension-serviceaccount-deprecated
+  labels:
+    app.kubernetes.io/name: operator-controller
+    app.kubernetes.io/part-of: olm
+  annotations:
+    olm.operatorframework.io/feature-set: standard
+spec:
+  policyName: clusterextension-serviceaccount-deprecated
+  validationActions:
+    - Warn

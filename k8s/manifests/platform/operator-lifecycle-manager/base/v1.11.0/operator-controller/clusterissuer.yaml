@@ -1,0 +1,12 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  annotations:
+    olm.operatorframework.io/feature-set: standard
+  labels:
+    app.kubernetes.io/name: olmv1
+    app.kubernetes.io/part-of: olm
+  name: olmv1-ca
+spec:
+  ca:
+    secretName: olmv1-ca

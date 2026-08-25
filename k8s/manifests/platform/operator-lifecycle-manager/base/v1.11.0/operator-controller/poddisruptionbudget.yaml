@@ -1,0 +1,33 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: catalogd-controller-manager
+  namespace: olmv1-system
+  labels:
+    app.kubernetes.io/name: catalogd
+    app.kubernetes.io/part-of: olm
+  annotations:
+    olm.operatorframework.io/feature-set: standard
+spec:
+  minAvailable: 1
+  unhealthyPodEvictionPolicy: AlwaysAllow
+  selector:
+    matchLabels:
+      control-plane: catalogd-controller-manager
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: operator-controller-controller-manager
+  namespace: olmv1-system
+  labels:
+    app.kubernetes.io/name: operator-controller
+    app.kubernetes.io/part-of: olm
+  annotations:
+    olm.operatorframework.io/feature-set: standard
+spec:
+  minAvailable: 1
+  unhealthyPodEvictionPolicy: AlwaysAllow
+  selector:
+    matchLabels:
+      control-plane: operator-controller-controller-manager

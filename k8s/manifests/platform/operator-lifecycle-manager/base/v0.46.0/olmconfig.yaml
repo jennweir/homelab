@@ -1,6 +1,0 @@
-apiVersion: operators.coreos.com/v1
-kind: OLMConfig
-metadata:
-  name: cluster
-  annotations:
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
