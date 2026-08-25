@@ -22,6 +22,11 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       serviceAccountName: olm-operator-serviceaccount
+      enableServiceLinks: false
+      restartPolicy: Always
+      schedulerName: default
+      dnsPolicy: ClusterFirst
+      automountServiceAccountToken: false
       volumes:
         - name: tmpfs
           emptyDir: {}
@@ -30,6 +35,10 @@ spec:
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
             capabilities:
               drop:
                 - ALL
@@ -66,5 +75,8 @@ spec:
             requests:
               cpu: 10m
               memory: 80Mi
+            limits:
+              cpu: 100m
+              memory: 200Mi
       nodeSelector:
         kubernetes.io/os: linux
