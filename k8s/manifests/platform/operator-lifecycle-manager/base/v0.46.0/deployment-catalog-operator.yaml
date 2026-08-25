@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog-operator
+  namespace: olm
+  labels:
+    app: catalog-operator
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: catalog-operator
+  template:
+    metadata:
+      labels:
+        app: catalog-operator
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      serviceAccountName: olm-operator-serviceaccount
+      enableServiceLinks: false
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      dnsPolicy: ClusterFirst
+      automountServiceAccountToken: true
+      volumes:
+        - name: tmpfs
+          emptyDir: {}
+      containers:
+        - name: catalog-operator
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: tmpfs
+              mountPath: /tmp
+          command:
+            - /bin/catalog
+          args:
+            - --namespace
+            - olm
+            - --configmapServerImage=quay.io/operator-framework/configmap-operator-registry:latest
+            - --opmImage=quay.io/operator-framework/opm@sha256:e5a6220603fb4504d58c6e3e488386b817e3695c906a62ee0370b5faedc3799a
+            - --util-image
+            - quay.io/operator-framework/olm@sha256:4404599eb7b7736bdbd0f36260a60599f32acb6edeaf7d0c54bb10b36619e5fe
+            - --set-workload-user-id=true
+          image: quay.io/operator-framework/olm@sha256:4404599eb7b7736bdbd0f36260a60599f32acb6edeaf7d0c54bb10b36619e5fe
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: metrics
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+              scheme: HTTP
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+              scheme: HTTP
+          terminationMessagePolicy: FallbackToLogsOnError
+          resources:
+            requests:
+              cpu: 10m
+              memory: 80Mi
+            limits:
+              cpu: 100m
+              memory: 200Mi
+      nodeSelector:
+        kubernetes.io/os: linux
