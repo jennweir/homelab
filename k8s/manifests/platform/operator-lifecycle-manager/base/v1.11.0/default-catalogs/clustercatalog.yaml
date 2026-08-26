@@ -2,7 +2,6 @@ apiVersion: olm.operatorframework.io/v1
 kind: ClusterCatalog
 metadata:
   name: operatorhubio
-  namespace: olmv1-system
 spec:
   source:
     type: Image
