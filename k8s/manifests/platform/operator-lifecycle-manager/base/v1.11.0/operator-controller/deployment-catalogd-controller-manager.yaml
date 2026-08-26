@@ -46,19 +46,22 @@ spec:
           livenessProbe:
             httpGet:
               path: /healthz
-              port: 8081
+              port: probe
             initialDelaySeconds: 15
             periodSeconds: 20
           readinessProbe:
             httpGet:
               path: /readyz
-              port: 8081
+              port: probe
             initialDelaySeconds: 5
             periodSeconds: 10
           resources:
             requests:
               cpu: 100m
               memory: 200Mi
+            limits:
+              cpu: 200m
+              memory: 400Mi
           volumeMounts:
             - mountPath: /var/cache/
               name: cache
@@ -77,6 +80,9 @@ spec:
                 - ALL
             readOnlyRootFilesystem: true
           terminationMessagePolicy: FallbackToLogsOnError
+          probes:
+            - name: probe
+              containerPort: 8081
       serviceAccountName: catalogd-controller-manager
       volumes:
         - emptyDir: {}

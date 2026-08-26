@@ -51,19 +51,22 @@ spec:
           livenessProbe:
             httpGet:
               path: /healthz
-              port: 8081
+              port: probe
             initialDelaySeconds: 15
             periodSeconds: 20
           readinessProbe:
             httpGet:
               path: /readyz
-              port: 8081
+              port: probe
             initialDelaySeconds: 5
             periodSeconds: 10
           resources:
             requests:
               cpu: 10m
               memory: 64Mi
+            limits:
+              cpu: 20m
+              memory: 128Mi
           volumeMounts:
             - mountPath: /var/cache
               name: cache
@@ -83,6 +86,9 @@ spec:
                 - ALL
             readOnlyRootFilesystem: true
           terminationMessagePolicy: FallbackToLogsOnError
+          ports:
+          - name: probe
+            containerPort: 8081
       serviceAccountName: operator-controller-controller-manager
       volumes:
         - emptyDir: {}
