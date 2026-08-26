@@ -2,6 +2,8 @@ apiVersion: olm.operatorframework.io/v1
 kind: ClusterExtension
 metadata:
   name: argocd
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   namespace: argocd-operator
   source:
