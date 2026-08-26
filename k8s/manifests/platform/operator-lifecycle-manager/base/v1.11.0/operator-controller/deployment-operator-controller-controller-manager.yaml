@@ -51,13 +51,13 @@ spec:
           livenessProbe:
             httpGet:
               path: /healthz
-              port: 8081
+              port: probe
             initialDelaySeconds: 15
             periodSeconds: 20
           readinessProbe:
             httpGet:
               path: /readyz
-              port: 8081
+              port: probe
             initialDelaySeconds: 5
             periodSeconds: 10
           resources:
@@ -92,6 +92,8 @@ spec:
           ports:
             - name: metrics
               containerPort: 8443
+            - name: probe
+              containerPort: 8081
       serviceAccountName: operator-controller-controller-manager
       volumes:
         - emptyDir: {}
