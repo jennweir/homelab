@@ -46,7 +46,7 @@ spec:
             - --pull-cas-dir=/var/ca-certs
           command:
             - /operator-controller
-          image: quay.io/operator-framework/operator-controller:v1.11.0
+          image: quay.io/operator-framework/operator-controller:v1.11.0-amd64@sha256:ac3979c4476539f180ca5499fabb18bb1971c0f34ed8147c76e2e765cd67a7c2
           name: manager
           livenessProbe:
             httpGet:
