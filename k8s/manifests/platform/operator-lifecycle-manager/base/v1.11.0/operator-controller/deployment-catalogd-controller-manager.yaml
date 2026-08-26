@@ -80,9 +80,6 @@ spec:
                 - ALL
             readOnlyRootFilesystem: true
           terminationMessagePolicy: FallbackToLogsOnError
-          privileged: false
-          runAsNonRoot: true
-          seccompProfile: RuntimeDefault
           ports:
             - name: https
               containerPort: 8443
@@ -138,11 +135,6 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       terminationGracePeriodSeconds: 10
-      enableServiceLinks: false
-      restartPolicy: Always
-      schedulerName: default-scheduler
-      dnsPolicy: ClusterFirst
-      automountServiceAccountToken: false
       tolerations:
         - effect: NoSchedule
           key: node-role.kubernetes.io/control-plane

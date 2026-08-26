@@ -86,9 +86,6 @@ spec:
                 - ALL
             readOnlyRootFilesystem: true
           terminationMessagePolicy: FallbackToLogsOnError
-          privileged: false
-          runAsNonRoot: true
-          seccompProfile: RuntimeDefault
           ports:
             - name: metrics
               containerPort: 8443
