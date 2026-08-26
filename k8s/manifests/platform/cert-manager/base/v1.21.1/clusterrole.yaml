@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/name: cainjector
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: cainjector
-    app.kubernetes.io/version: v1.18.2
+    app.kubernetes.io/version: v1.21.1
 rules:
   - apiGroups:
       - cert-manager.io
@@ -75,7 +75,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: controller
-    app.kubernetes.io/version: v1.18.2
+    app.kubernetes.io/version: v1.21.1
 rules:
   - apiGroups:
       - cert-manager.io
@@ -121,7 +121,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: controller
-    app.kubernetes.io/version: v1.18.2
+    app.kubernetes.io/version: v1.21.1
 rules:
   - apiGroups:
       - cert-manager.io
@@ -167,7 +167,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: controller
-    app.kubernetes.io/version: v1.18.2
+    app.kubernetes.io/version: v1.21.1
 rules:
   - apiGroups:
       - cert-manager.io
@@ -236,7 +236,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: controller
-    app.kubernetes.io/version: v1.18.2
+    app.kubernetes.io/version: v1.21.1
 rules:
   - apiGroups:
       - acme.cert-manager.io
@@ -278,6 +278,13 @@ rules:
     verbs:
       - update
   - apiGroups:
+      - cert-manager.io
+    resources:
+      - clusterissuers/finalizers
+      - issuers/finalizers
+    verbs:
+      - update
+  - apiGroups:
       - ""
     resources:
       - secrets
@@ -302,7 +309,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: controller
-    app.kubernetes.io/version: v1.18.2
+    app.kubernetes.io/version: v1.21.1
 rules:
   - apiGroups:
       - acme.cert-manager.io
@@ -407,7 +414,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: controller
-    app.kubernetes.io/version: v1.18.2
+    app.kubernetes.io/version: v1.21.1
 rules:
   - apiGroups:
       - cert-manager.io
@@ -448,6 +455,7 @@ rules:
     resources:
       - gateways
       - httproutes
+      - listenersets
     verbs:
       - get
       - list
@@ -457,6 +465,7 @@ rules:
     resources:
       - gateways/finalizers
       - httproutes/finalizers
+      - listenersets/finalizers
     verbs:
       - update
   - apiGroups:
@@ -476,7 +485,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: controller
-    app.kubernetes.io/version: v1.18.2
+    app.kubernetes.io/version: v1.21.1
     rbac.authorization.k8s.io/aggregate-to-cluster-reader: "true"
 rules:
   - apiGroups:
@@ -497,7 +506,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: controller
-    app.kubernetes.io/version: v1.18.2
+    app.kubernetes.io/version: v1.21.1
     rbac.authorization.k8s.io/aggregate-to-view: "true"
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
@@ -532,7 +541,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: controller
-    app.kubernetes.io/version: v1.18.2
+    app.kubernetes.io/version: v1.21.1
     rbac.authorization.k8s.io/aggregate-to-edit: "true"
     rbac.authorization.k8s.io/aggregate-to-admin: "true"
 rules:
@@ -558,13 +567,18 @@ rules:
       - acme.cert-manager.io
     resources:
       - challenges
-      - orders
     verbs:
-      - create
       - delete
       - deletecollection
       - patch
       - update
+  - apiGroups:
+      - acme.cert-manager.io
+    resources:
+      - orders
+    verbs:
+      - delete
+      - deletecollection
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -575,7 +589,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: cert-manager
-    app.kubernetes.io/version: v1.18.2
+    app.kubernetes.io/version: v1.21.1
 rules:
   - apiGroups:
       - cert-manager.io
@@ -596,7 +610,7 @@ metadata:
     app.kubernetes.io/name: cert-manager
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: cert-manager
-    app.kubernetes.io/version: v1.18.2
+    app.kubernetes.io/version: v1.21.1
 rules:
   - apiGroups:
       - certificates.k8s.io
@@ -639,7 +653,7 @@ metadata:
     app.kubernetes.io/name: webhook
     app.kubernetes.io/instance: cert-manager
     app.kubernetes.io/component: webhook
-    app.kubernetes.io/version: v1.18.2
+    app.kubernetes.io/version: v1.21.1
 rules:
   - apiGroups:
       - authorization.k8s.io
