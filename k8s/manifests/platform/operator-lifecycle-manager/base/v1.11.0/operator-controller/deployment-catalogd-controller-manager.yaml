@@ -46,13 +46,13 @@ spec:
           livenessProbe:
             httpGet:
               path: /healthz
-              port: probe
+              port: 8081
             initialDelaySeconds: 15
             periodSeconds: 20
           readinessProbe:
             httpGet:
               path: /readyz
-              port: probe
+              port: 8081
             initialDelaySeconds: 5
             periodSeconds: 10
           resources:
@@ -80,9 +80,13 @@ spec:
                 - ALL
             readOnlyRootFilesystem: true
           terminationMessagePolicy: FallbackToLogsOnError
-          probes:
-            - name: probe
-              containerPort: 8081
+          ports:
+            - name: https
+              containerPort: 8443
+            - name: webhook
+              containerPort: 9443
+            - name: metrics
+              containerPort: 7443
       serviceAccountName: catalogd-controller-manager
       volumes:
         - emptyDir: {}
