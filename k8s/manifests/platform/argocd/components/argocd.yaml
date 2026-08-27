@@ -29,8 +29,8 @@ spec:
         memory: 128Mi
   redis:
     # specify image manually to avoid imagePullBackoff from enabling shortname enforcement in cri-o v1.34
-    image: public.ecr.aws/docker/library/redis:8.4.0
-    version: sha256:47200b04138293fae39737e50878a238b13ec0781083126b1b0c63cf5d992e8d
+    image: public.ecr.aws/docker/library/redis:8.10.1
+    version: sha256:298e5b3bc566bade82f46ad5511777a4a07a294097ce16ada2f6a42be5239df5
     resources:
       limits:
         cpu: 200m
