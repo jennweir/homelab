@@ -1,0 +1,23 @@
+kind: Application
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: operator-lifecycle-manager
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: olmv1-system
+  project: default
+  source:
+    repoURL: https://github.com/jennweir/homelab.git
+    path: k8s/manifests/platform/operator-lifecycle-manager/overlays/lab
+    targetRevision: olm-v1
+  syncPolicy:
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        maxDuration: 5m
+        factor: 2

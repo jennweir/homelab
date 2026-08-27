@@ -1,0 +1,77 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  annotations:
+    olm.operatorframework.io/feature-set: standard
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+  labels:
+    app.kubernetes.io/name: olmv1
+    app.kubernetes.io/part-of: olm
+  name: olmv1-ca
+  namespace: cert-manager
+spec:
+  commonName: olmv1-ca
+  isCA: true
+  issuerRef:
+    group: cert-manager.io
+    kind: Issuer
+    name: self-sign-issuer
+  privateKey:
+    algorithm: ECDSA
+    rotationPolicy: Always
+    size: 256
+  secretName: olmv1-ca
+  secretTemplate:
+    annotations:
+      cert-manager.io/allow-direct-injection: "true"
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  annotations:
+    olm.operatorframework.io/feature-set: standard
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+  labels:
+    app.kubernetes.io/name: catalogd
+    app.kubernetes.io/part-of: olm
+  name: catalogd-service-cert
+  namespace: olmv1-system
+spec:
+  dnsNames:
+    - localhost
+    - catalogd-service.olmv1-system.svc
+    - catalogd-service.olmv1-system.svc.cluster.local
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: olmv1-ca
+  privateKey:
+    algorithm: ECDSA
+    rotationPolicy: Always
+    size: 256
+  secretName: catalogd-service-cert-v1.11.0
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  annotations:
+    olm.operatorframework.io/feature-set: standard
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+  labels:
+    app.kubernetes.io/name: olmv1
+    app.kubernetes.io/part-of: olm
+  name: operator-controller-cert
+  namespace: olmv1-system
+spec:
+  dnsNames:
+    - operator-controller-service.olmv1-system.svc
+    - operator-controller-service.olmv1-system.svc.cluster.local
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: olmv1-ca
+  privateKey:
+    algorithm: ECDSA
+    rotationPolicy: Always
+    size: 256
+  secretName: operator-controller-cert

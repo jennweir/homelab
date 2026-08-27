@@ -1,0 +1,160 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kubectl.kubernetes.io/default-logs-container: manager
+    olm.operatorframework.io/feature-set: standard
+  labels:
+    app.kubernetes.io/name: operator-controller
+    app.kubernetes.io/part-of: olm
+  name: operator-controller-controller-manager
+  namespace: olmv1-system
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      control-plane: operator-controller-controller-manager
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: manager
+        olm.operatorframework.io/feature-set: standard
+      labels:
+        app.kubernetes.io/name: operator-controller
+        control-plane: operator-controller-controller-manager
+        app.kubernetes.io/part-of: olm
+    spec:
+      containers:
+        - args:
+            - --health-probe-bind-address=:8081
+            - --metrics-bind-address=:8443
+            - --leader-elect
+            - --feature-gates=WebhookProviderCertManager=true
+            - --feature-gates=BoxcutterRuntime=false
+            - --feature-gates=BundleReleaseSupport=false
+            - --feature-gates=DeploymentConfig=true # set to true for argo custom env in argocd object
+            - --feature-gates=SingleOwnNamespaceInstallSupport=false
+            - --feature-gates=WebhookProviderOpenshiftServiceCA=false
+            - --tls-cert=/var/certs/tls.crt
+            - --tls-key=/var/certs/tls.key
+            - --catalogd-cas-dir=/var/ca-certs
+            - --pull-cas-dir=/var/ca-certs
+          command:
+            - /operator-controller
+          image: quay.io/operator-framework/operator-controller:v1.11.0-amd64@sha256:ac3979c4476539f180ca5499fabb18bb1971c0f34ed8147c76e2e765cd67a7c2
+          name: manager
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: probe
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: probe
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 20m
+              memory: 128Mi
+          volumeMounts:
+            - mountPath: /var/cache
+              name: cache
+            - mountPath: /tmp
+              name: tmp
+            - mountPath: /var/certs
+              name: operator-controller-certs
+              readOnly: true
+            - mountPath: /var/ca-certs
+              name: ca-certs
+              readOnly: true
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          terminationMessagePolicy: FallbackToLogsOnError
+          ports:
+            - name: metrics
+              containerPort: 8443
+            - name: probe
+              containerPort: 8081
+      serviceAccountName: operator-controller-controller-manager
+      volumes:
+        - emptyDir: {}
+          name: cache
+        - emptyDir: {}
+          name: tmp
+        - name: operator-controller-certs
+          secret:
+            items:
+              - key: tls.crt
+                path: tls.crt
+              - key: tls.key
+                path: tls.key
+            optional: false
+            secretName: operator-controller-cert
+        - name: ca-certs
+          secret:
+            items:
+              - key: ca.crt
+                path: olm-ca.crt
+            optional: false
+            secretName: operator-controller-cert
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
+                      - arm64
+                      - ppc64le
+                      - s390x
+                  - key: kubernetes.io/os
+                    operator: In
+                    values:
+                      - linux
+      nodeSelector:
+        kubernetes.io/os: linux
+        node-role.kubernetes.io/control-plane: ""
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      enableServiceLinks: false
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      dnsPolicy: ClusterFirst
+      automountServiceAccountToken: true
+      terminationGracePeriodSeconds: 10
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
+        - effect: NoExecute
+          key: node.kubernetes.io/unreachable
+          operator: Exists
+          tolerationSeconds: 120
+        - effect: NoExecute
+          key: node.kubernetes.io/not-ready
+          operator: Exists
+          tolerationSeconds: 120

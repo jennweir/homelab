@@ -1,0 +1,12 @@
+apiVersion: olm.operatorframework.io/v1
+kind: ClusterCatalog
+metadata:
+  name: operatorhubio
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  source:
+    type: Image
+    image:
+      ref: quay.io/operatorhubio/catalog:latest
+      pollIntervalMinutes: 10

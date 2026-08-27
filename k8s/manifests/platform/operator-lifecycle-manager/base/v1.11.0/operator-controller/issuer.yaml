@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  annotations:
+    olm.operatorframework.io/feature-set: standard
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+  labels:
+    app.kubernetes.io/name: olmv1
+    app.kubernetes.io/part-of: olm
+  name: self-sign-issuer
+  namespace: cert-manager
+spec:
+  selfSigned: {}
