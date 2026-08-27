@@ -80,10 +80,6 @@ spec:
                 - ALL
             readOnlyRootFilesystem: true
           terminationMessagePolicy: FallbackToLogsOnError
-          # privileged: false
-          # runAsNonRoot: true
-          # seccompProfile:
-          #   type: RuntimeDefault
           ports:
             - name: https
               containerPort: 8443

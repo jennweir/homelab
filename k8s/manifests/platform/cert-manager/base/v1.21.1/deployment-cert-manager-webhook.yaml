@@ -35,6 +35,10 @@ spec:
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      dnsPolicy: ClusterFirst
+      automountServiceAccountToken: true
       containers:
         - name: cert-manager-webhook
           image: quay.io/jetstack/cert-manager-webhook:v1.21.1@sha256:741084291faf115a2909bfe3515458b54926c67f039ac20effd821bac69817a4

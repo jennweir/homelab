@@ -35,6 +35,10 @@ spec:
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      dnsPolicy: ClusterFirst
+      automountServiceAccountToken: true
       containers:
         - name: cert-manager-cainjector
           image: quay.io/jetstack/cert-manager-cainjector:v1.21.1@sha256:1910ad7e134880e27d229e07affb43da1b07841a77f70c364f17467cb4e49bd9
