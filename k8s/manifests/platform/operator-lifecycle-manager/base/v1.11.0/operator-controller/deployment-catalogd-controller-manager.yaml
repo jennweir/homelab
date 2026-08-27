@@ -79,6 +79,10 @@ spec:
               drop:
                 - ALL
             readOnlyRootFilesystem: true
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
             - name: https

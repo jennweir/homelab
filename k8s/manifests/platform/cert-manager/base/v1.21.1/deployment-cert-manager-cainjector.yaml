@@ -61,6 +61,10 @@ spec:
               drop:
                 - ALL
             readOnlyRootFilesystem: true
+            privileged: false
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
           resources:
             requests:
               cpu: 50m
