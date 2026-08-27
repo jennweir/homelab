@@ -3,3 +3,5 @@ kind: OperatorGroup
 metadata:
   name: argocd-operator-group
   namespace: argocd-operator
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
