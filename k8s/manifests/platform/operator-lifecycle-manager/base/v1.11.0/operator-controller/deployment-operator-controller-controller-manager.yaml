@@ -85,6 +85,10 @@ spec:
               drop:
                 - ALL
             readOnlyRootFilesystem: true
+          # privileged: false
+          # runAsNonRoot: true
+          # seccompProfile:
+          #   type: RuntimeDefault
           terminationMessagePolicy: FallbackToLogsOnError
           ports:
             - name: metrics
@@ -136,6 +140,11 @@ spec:
         runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
+      enableServiceLinks: false
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      dnsPolicy: ClusterFirst
+      automountServiceAccountToken: true
       terminationGracePeriodSeconds: 10
       tolerations:
         - effect: NoSchedule
