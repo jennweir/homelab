@@ -1,0 +1,17 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: argocd-operator
+  namespace: argocd-operator
+spec:
+  channel: alpha
+  name: argocd-operator
+  source: operatorhubio-catalog
+  sourceNamespace: olm
+  installPlanApproval: Automatic
+  # installPlanApproval: Manual # oc patch installplan install-xxxxx -n argocd-operator --type merge --patch '{"spec":{"approved":true}}'
+  startingCSV: argocd-operator.v0.18.0
+  config:
+    env:
+      - name: ARGOCD_CLUSTER_CONFIG_NAMESPACES
+        value: argocd # https://access.redhat.com/solutions/7026814
