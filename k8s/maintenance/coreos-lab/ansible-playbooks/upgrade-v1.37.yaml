@@ -1,0 +1,259 @@
+---
+# https://kubernetes.io/docs/tasks/administer-cluster/kubeadm/kubeadm-upgrade/
+#
+# Upgrade a Fedora CoreOS kubeadm cluster from v1.36 to v1.37.
+#
+# On immutable CoreOS the kubeadm/kubelet/kubectl binaries live in the
+# read-only /usr/bin (ostree composefs) and cannot be replaced in place, and an
+# rpm-ostree rebase of a rebuilt image is treated by rpm-ostree as an
+# unchanged ref for a minor-to-minor upgrade on an already-customized node.
+#
+# Instead, we drop the v1.37 binaries into /usr/local/bin (=> /var/usrlocal/bin,
+# writable and persistent), override the kubelet ExecStart to use the new
+# binary, then run the standard kubeadm control-plane upgrade. Also, there are no worker nodes
+# in this cluster so this playbook only covers cp node updates.
+
+- name: Upgrade Kubernetes node binaries to v1.37
+  hosts: coreos_lab
+  become: true
+  gather_facts: true
+  serial: 1
+  vars:
+    target_version: "1.37.0"
+    release_base_url: "https://dl.k8s.io/release/v{{ target_version }}/bin/linux/amd64"
+    previous_kubernetes_minor: "1.36"
+    kube_binaries:
+      - kubeadm
+      - kubelet
+      - kubectl
+  pre_tasks:
+    - name: Require Fedora CoreOS
+      ansible.builtin.assert:
+        that:
+          - ansible_facts.distribution == 'Fedora'
+          - ansible_facts.os_family == 'RedHat'
+        fail_msg: This playbook is for Fedora CoreOS nodes only.
+
+    - name: Record the current kubeadm version
+      ansible.builtin.command: kubeadm version -o short
+      register: kubeadm_version_pre
+      changed_when: false
+
+    - name: Set whether this node is already at the target version
+      ansible.builtin.set_fact:
+        node_at_target: "{{ kubeadm_version_pre.stdout == 'v' ~ target_version }}"
+
+    - name: Require the node to be within the expected upgrade range
+      ansible.builtin.assert:
+        that:
+          - kubeadm_version_pre.stdout is search('v' ~ previous_kubernetes_minor ~ '\\.')
+            or node_at_target
+        fail_msg: >-
+          Unexpected kubeadm version {{ kubeadm_version_pre.stdout }} on
+          {{ inventory_hostname }}; expected v{{ previous_kubernetes_minor }}.*
+          (to upgrade) or v{{ target_version }} (already upgraded).
+  tasks:
+    - name: Skip the binary swap on an already-upgraded node
+      ansible.builtin.debug:
+        msg: >-
+          {{ inventory_hostname }} is already at v{{ target_version }};
+          skipping the binary swap.
+      when: node_at_target
+
+    - name: Ensure /usr/local/bin exists
+      ansible.builtin.file:
+        path: /usr/local/bin
+        state: directory
+        mode: "0755"
+      when: not node_at_target
+
+    - name: Check whether the Kubernetes release endpoint is reachable
+      ansible.builtin.uri:
+        url: "{{ release_base_url }}/kubeadm"
+        method: HEAD
+        timeout: 15
+      register: release_http
+      changed_when: false
+      when: not node_at_target
+
+    - name: Stop when the release endpoint is unreachable
+      ansible.builtin.assert:
+        that: release_http.status == 200
+        fail_msg: >-
+          Could not reach {{ release_base_url }} to download v{{ target_version }}
+          Kubernetes binaries.
+      when: not node_at_target
+
+    - name: Download the v1.37 Kubernetes node binaries
+      ansible.builtin.get_url:
+        url: "{{ release_base_url }}/{{ item }}"
+        dest: "/usr/local/bin/{{ item }}"
+        mode: "0755"
+        timeout: 120
+      loop: "{{ kube_binaries }}"
+      when: not node_at_target
+
+    - name: Verify the downloaded kubeadm binary version
+      ansible.builtin.command: /usr/local/bin/kubeadm version -o short
+      register: kubeadm_version_new
+      changed_when: false
+      when: not node_at_target
+
+    - name: Require the new kubeadm to report the target version
+      ansible.builtin.assert:
+        that: kubeadm_version_new.stdout == 'v{{ target_version }}'
+        fail_msg: >-
+          Unexpected new kubeadm version {{ kubeadm_version_new.stdout }} on
+          {{ inventory_hostname }}; expected v{{ target_version }}.
+      when: not node_at_target
+
+    - name: Point the kubelet service at the new binary
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/kubelet.service.d/20-kubelet-path.conf
+        mode: "0644"
+        content: |
+          [Service]
+          ExecStart=
+          ExecStart=/usr/local/bin/kubelet $KUBELET_KUBECONFIG_ARGS $KUBELET_CONFIG_ARGS $KUBELET_KUBEADM_ARGS $KUBELET_EXTRA_ARGS
+      when: not node_at_target
+
+    - name: Restart CRI-O
+      ansible.builtin.systemd:
+        name: crio.service
+        state: restarted
+        daemon_reload: true
+      when: not node_at_target
+
+    - name: Reload and restart the kubelet with the new binary
+      ansible.builtin.systemd:
+        name: kubelet.service
+        state: restarted
+        daemon_reload: true
+      when: not node_at_target
+
+- name: Upgrade the first control-plane with kubeadm
+  hosts: coreos_lab
+  become: true
+  gather_facts: false
+  serial: 1
+  vars:
+    control_plane_endpoint: 192.168.0.201:6443
+    target_version: "1.37.0"
+  tasks:
+    - name: Check whether the first control-plane is already at the target
+      ansible.builtin.command: kubeadm version -o short
+      register: cp1_version
+      changed_when: false
+      when: inventory_hostname == groups['coreos_lab'][0]
+      run_once: true
+
+    - name: Check the upgrade plan
+      ansible.builtin.command:
+        cmd: /usr/local/bin/kubeadm upgrade plan --kubeconfig /etc/kubernetes/admin.conf
+      when:
+        - inventory_hostname == groups['coreos_lab'][0]
+        - cp1_version.stdout != 'v' ~ target_version
+      run_once: true
+      changed_when: false
+
+    - name: Apply the kubeadm upgrade on the first control-plane
+      ansible.builtin.command:
+        cmd: >-
+          /usr/local/bin/kubeadm upgrade apply {{ target_version }}
+          --certificate-renewal=true
+          --kubeconfig /etc/kubernetes/admin.conf
+      when:
+        - inventory_hostname == groups['coreos_lab'][0]
+        - cp1_version.stdout != 'v' ~ target_version
+      run_once: true
+      register: upgrade_apply
+      until: upgrade_apply.rc == 0
+      retries: 3
+      delay: 15
+
+    - name: Wait for the control plane endpoint to answer
+      ansible.builtin.wait_for:
+        host: "{{ (control_plane_endpoint.split(':'))[0] }}"
+        port: 6443
+        timeout: 300
+      when: inventory_hostname == groups['coreos_lab'][0]
+      run_once: true
+
+- name: Upgrade the remaining control-plane nodes with kubeadm
+  hosts: coreos_lab
+  become: true
+  gather_facts: true
+  serial: 1
+  vars:
+    target_version: "1.37.0"
+  tasks:
+    - name: Record the current kubeadm version
+      ansible.builtin.command: kubeadm version -o short
+      register: kubeadm_version_node
+      changed_when: false
+
+    - name: Upgrade the control-plane node component
+      ansible.builtin.command:
+        cmd: >-
+          /usr/local/bin/kubeadm upgrade node
+          --certificate-renewal=true
+          --control-plane
+          --kubeconfig /etc/kubernetes/admin.conf
+      when:
+        - inventory_hostname != groups['coreos_lab'][0]
+        - kubeadm_version_node.stdout != 'v' ~ target_version
+      register: upgrade_node
+      until: upgrade_node.rc == 0
+      retries: 3
+      delay: 15
+
+- name: Verify the cluster and Cilium after the upgrade
+  hosts: coreos_lab
+  become: true
+  gather_facts: false
+  serial: 1
+  vars:
+    control_plane_endpoint: 192.168.0.201:6443
+  tasks:
+    - name: Wait for the control plane endpoint to answer
+      ansible.builtin.wait_for:
+        host: "{{ (control_plane_endpoint.split(':'))[0] }}"
+        port: 6443
+        timeout: 120
+      when: inventory_hostname == groups['coreos_lab'][0]
+      run_once: true
+
+    - name: Wait for every node to be Ready at the target version
+      ansible.builtin.shell:
+        cmd: >-
+          kubectl get nodes --kubeconfig /etc/kubernetes/admin.conf
+          -o jsonpath='{range .items[*]}{.metadata.name}{" "}{.status.conditions[?(@.type=="Ready")].status}{" "}{.status.nodeInfo.kubeletVersion}{"\n"}{end}'
+      when: inventory_hostname == groups['coreos_lab'][0]
+      run_once: true
+      register: nodes_status
+      changed_when: false
+
+    - name: Show the node status
+      ansible.builtin.debug:
+        var: nodes_status.stdout_lines
+      when: inventory_hostname == groups['coreos_lab'][0]
+      run_once: true
+
+    - name: Wait for the Cilium DaemonSet to roll out
+      ansible.builtin.command:
+        cmd: >-
+          kubectl -n kube-system rollout status daemonset/cilium
+          --kubeconfig /etc/kubernetes/admin.conf --timeout=600s
+      when: inventory_hostname == groups['coreos_lab'][0]
+      run_once: true
+      changed_when: false
+
+    - name: Wait for the Cilium operator to be available
+      ansible.builtin.command:
+        cmd: >-
+          kubectl -n kube-system rollout status deployment/cilium-operator
+          --kubeconfig /etc/kubernetes/admin.conf --timeout=300s
+      when: inventory_hostname == groups['coreos_lab'][0]
+      run_once: true
+      changed_when: false
+      failed_when: false
