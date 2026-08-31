@@ -15,7 +15,9 @@ helm repo update
 helm template cilium cilium/cilium --version 1.20.0 \
     --namespace kube-system \
     --set kubeProxyReplacement=true \
-    --set gatewayAPI.enabled=true > cilium.yaml
+    --set gatewayAPI.enabled=true \
+    --set k8sServiceHost=192.168.0.201 \
+    --set k8sServicePort=6443 > cilium.yaml
 
 if command -v gsed >/dev/null 2>&1; then
     SED="gsed"
