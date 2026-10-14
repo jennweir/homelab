@@ -12,10 +12,15 @@ helm repo update
 #     > cilium.yaml
 
 # Cilium as a gateway-api provider
+# todo: hubble.tls.auto.method=certmanager
 helm template cilium cilium/cilium --version 1.20.0 \
     --namespace kube-system \
+    --set hubble.enabled=true \
+    --set hubble.tls.enabled=false \
     --set kubeProxyReplacement=true \
     --set gatewayAPI.enabled=true \
+    --set l2announcements.enabled=true \
+    --api-versions='gateway.networking.k8s.io/v1/GatewayClass' \
     --set k8sServiceHost=192.168.0.201 \
     --set k8sServicePort=6443 > cilium.yaml
 

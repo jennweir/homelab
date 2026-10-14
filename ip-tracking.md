@@ -19,8 +19,9 @@ OKD cluster ingress vip
 k8s cluster kube-vip VIP
 192.168.0.201
 
-Metallb okd cluster
+k8s lab cilium lb pool
 192.168.0.225-192.168.0.234
+    sable DNS server 192.168.0.226
 
 Metallb k8s pi cluster IP space
 192.168.0.235-192.168.0.255
