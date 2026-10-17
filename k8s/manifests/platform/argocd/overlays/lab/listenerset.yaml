@@ -3,6 +3,8 @@ kind: ListenerSet
 metadata:
   name: argocd
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   parentRef:
     name: web-gateway
