@@ -5,9 +5,9 @@ metadata:
   namespace: sable
 spec:
   targetRefs:
-  - kind: Service
-    name: sable-web
-    group: ""
+    - kind: Service
+      name: sable-web
+      group: ""
   validation:
     hostname: sable-web.sable.svc.cluster.local
     wellKnownCACertificates: System

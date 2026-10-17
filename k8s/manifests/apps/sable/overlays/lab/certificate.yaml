@@ -9,4 +9,4 @@ spec:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-  - "sable.homelab.jenniferpweir.com"
+    - "sable.homelab.jenniferpweir.com"

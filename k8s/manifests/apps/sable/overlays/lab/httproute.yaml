@@ -5,22 +5,22 @@ metadata:
   namespace: sable
 spec:
   parentRefs:
-  - name: sable
-    namespace: sable
-    kind: ListenerSet
-    group: gateway.networking.k8s.io
-    sectionName: sable-https
-  hostnames:
-  - "sable.homelab.jenniferpweir.com"
-  rules:
-  - backendRefs:
-    - group: ""
-      kind: Service
-      name: sable-web
+    - name: sable
       namespace: sable
-      port: 5380
-      weight: 1
-    matches:
-      - path:
-          type: PathPrefix
-          value: /
+      kind: ListenerSet
+      group: gateway.networking.k8s.io
+      sectionName: sable-https
+  hostnames:
+    - "sable.homelab.jenniferpweir.com"
+  rules:
+    - backendRefs:
+        - group: ""
+          kind: Service
+          name: sable-web
+          namespace: sable
+          port: 5380
+          weight: 1
+      matches:
+        - path:
+            type: PathPrefix
+            value: /

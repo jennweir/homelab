@@ -10,14 +10,14 @@ spec:
     kind: Gateway
     group: gateway.networking.k8s.io
   listeners:
-  - name: sable-https
-    protocol: HTTPS
-    port: 443
-    hostname: "sable.homelab.jenniferpweir.com"
-    allowedRoutes:
-      namespaces:
-        from: Same
-    tls:
-      mode: Terminate
-      certificateRefs:
-      - name: sable-certificate-secret
+    - name: sable-https
+      protocol: HTTPS
+      port: 443
+      hostname: "sable.homelab.jenniferpweir.com"
+      allowedRoutes:
+        namespaces:
+          from: Same
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: sable-certificate-secret
