@@ -17,7 +17,7 @@ spec:
       # previous account.
       name: letsencrypt-staging
     solvers:
-    - dns01:
-        cloudDNS:
-          project: coreos-k8s-lab
-          hostedZoneName: homelab-zone
+      - dns01:
+          cloudDNS:
+            project: coreos-k8s-lab
+            hostedZoneName: homelab-zone

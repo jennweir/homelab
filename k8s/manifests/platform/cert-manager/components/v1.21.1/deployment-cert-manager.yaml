@@ -74,12 +74,12 @@ spec:
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: /etc/gcp-wif/gcp-wif-config.json
           volumeMounts:
-          - name: gcp-wif-config-vol
-            mountPath: /etc/gcp-wif
-            readOnly: true
-          - name: gcp-token-vol
-            mountPath: /var/run/secrets/tokens
-            readOnly: true
+            - name: gcp-wif-config-vol
+              mountPath: /etc/gcp-wif
+              readOnly: true
+            - name: gcp-token-vol
+              mountPath: /var/run/secrets/tokens
+              readOnly: true
           livenessProbe:
             httpGet:
               port: http-healthz
@@ -100,13 +100,13 @@ spec:
       nodeSelector:
         kubernetes.io/os: linux
       volumes:
-      - name: gcp-wif-config-vol
-        configMap:
-          name: gcp-wif-config
-      - name: gcp-token-vol
-        projected:
-          sources:
-          - serviceAccountToken:
-              audience: "//iam.googleapis.com/projects/138245118216/locations/global/workloadIdentityPools/k8s-pool/providers/k8s-provider"
-              expirationSeconds: 3600
-              path: gcp-token
+        - name: gcp-wif-config-vol
+          configMap:
+            name: gcp-wif-config
+        - name: gcp-token-vol
+          projected:
+            sources:
+              - serviceAccountToken:
+                  audience: "//iam.googleapis.com/projects/138245118216/locations/global/workloadIdentityPools/k8s-pool/providers/k8s-provider"
+                  expirationSeconds: 3600
+                  path: gcp-token
