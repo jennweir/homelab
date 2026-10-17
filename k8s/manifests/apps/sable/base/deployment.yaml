@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sable
+  namespace: sable
+spec:
+  selector:
+    matchLabels:
+      app: sable
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: sable
+    spec:
+      # the image runs as "nonroot" but ships no /etc/passwd, so runAsUser must be numeric for runAsNonRoot to pass admission; fsGroup makes the emptyDir volume writable
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        fsGroup: 65532
+        fsGroupChangePolicy: OnRootMismatch
+      # independent resolvers so startup and block-list downloads never depend on sable itself
+      dnsPolicy: None
+      dnsConfig:
+        nameservers:
+          - 1.1.1.1
+          - 9.9.9.9
+      containers:
+        - name: sable
+          image: ghcr.io/drudge/sable:1.7.1@sha256:9f09002ea2c37170e601ca707c3273f59a1883d8c825ad233b8d1ef554495652
+          envFrom:
+            - configMapRef:
+                name: sable
+          ports:
+            - name: udp-dns
+              containerPort: 8053
+              protocol: UDP
+            - name: tcp-dns
+              containerPort: 8053
+              protocol: TCP
+            - name: console
+              containerPort: 5380
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: tcp-dns
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 6
+          readinessProbe:
+            tcpSocket:
+              port: tcp-dns
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: sable-data-volume
+              mountPath: /data
+            - name: sable-toml-config
+              mountPath: /data/sable.toml
+              subPath: sable.toml
+      volumes:
+        - name: sable-data-volume
+          emptyDir: {}
+        - name: sable-toml-config
+          configMap:
+            name: sable-toml
+            items:
+              - key: sable.toml
+                path: sable.toml
