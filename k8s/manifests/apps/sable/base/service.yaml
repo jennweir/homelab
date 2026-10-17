@@ -1,0 +1,36 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: sable-dns
+  namespace: sable
+  annotations:
+    # request stable IP from the Cilium LB IPAM pool so DNS clients can expect it to stay the same
+    io.cilium/lb-ipam-ips: "192.168.0.226"
+spec:
+  selector:
+    app: sable
+  type: LoadBalancer
+  ports:
+    - name: udp-dns
+      port: 53
+      targetPort: udp-dns
+      protocol: UDP
+    - name: tcp-dns
+      port: 53
+      targetPort: tcp-dns
+      protocol: TCP
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: sable-web
+  namespace: sable
+spec:
+  selector:
+    app: sable
+  type: ClusterIP
+  ports:
+    - name: console
+      port: 5380
+      targetPort: console
+      protocol: TCP
