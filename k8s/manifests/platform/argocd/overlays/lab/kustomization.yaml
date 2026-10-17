@@ -4,4 +4,3 @@ resources:
   - ../../base
   - ../../components
   - ../../operator/olm-v0/v0.18.0
-  - httproute.yaml

@@ -3,13 +3,15 @@ kind: HTTPRoute
 metadata:
   name: force-https
   namespace: gateway-infra
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   parentRefs:
-  - name: web-gateway
-    sectionName: http
+    - name: web-gateway
+      sectionName: http
   rules:
-  - filters:
-    - type: RequestRedirect
-      requestRedirect:
-        scheme: https
-        statusCode: 301
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301
