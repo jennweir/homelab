@@ -10,14 +10,14 @@ spec:
     kind: Gateway
     group: gateway.networking.k8s.io
   listeners:
-  - name: argocd-https
-    protocol: HTTPS
-    port: 443
-    hostname: "argocd.homelab.jenniferpweir.com"
-    allowedRoutes:
-      namespaces:
-        from: Same
-    tls:
-      mode: Terminate
-      certificateRefs:
-      - name: argocd-certificate-secret
+    - name: argocd-https
+      protocol: HTTPS
+      port: 443
+      hostname: "argocd.homelab.jenniferpweir.com"
+      allowedRoutes:
+        namespaces:
+          from: Same
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: argocd-certificate-secret
