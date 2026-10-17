@@ -294,3 +294,64 @@
         cmd: "{{ hostvars[groups['coreos_lab'][0]].control_plane_join_command }} --cri-socket unix:///var/run/crio/crio.sock"
       when: inventory_hostname != groups['coreos_lab'][0] and not kubelet_conf.stat.exists
       no_log: true
+
+- name: Publish the service account token issuer for OIDC and workload identity federation
+  hosts: coreos_lab
+  become: true
+  gather_facts: false
+  serial: 1
+  tags: oidc-issuer
+  vars:
+    service_account_issuer: https://storage.googleapis.com/jennweir-homelab-oidc
+    service_account_jwks_uri: https://storage.googleapis.com/jennweir-homelab-oidc/openid/v1/jwks
+    kube_apiserver_internal_issuer: https://kubernetes.default.svc.cluster.local
+    kube_apiserver_manifest: /etc/kubernetes/manifests/kube-apiserver.yaml
+  tasks:
+    - name: Check whether the API server manifest exists
+      ansible.builtin.stat:
+        path: "{{ kube_apiserver_manifest }}"
+      register: oidc_apiserver_manifest
+
+    - name: Find stray files in the static pod directory
+      ansible.builtin.find:
+        paths: /etc/kubernetes/manifests
+        recurse: false
+        file_type: file
+        patterns:
+          - "*.bak*"
+          - "*.orig"
+          - "*~"
+      register: oidc_stray_manifests
+      when: oidc_apiserver_manifest.stat.exists
+
+    - name: Delete stray files from the static pod directory
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      loop: "{{ oidc_stray_manifests.files | default([]) }}"
+      notify: Restart kubelet for OIDC issuer
+      when: oidc_apiserver_manifest.stat.exists
+
+    - name: Add the public service account token issuer
+      ansible.builtin.lineinfile:
+        path: "{{ kube_apiserver_manifest }}"
+        insertbefore: "^    - --service-account-issuer={{ kube_apiserver_internal_issuer | regex_escape }}$"
+        line: "    - --service-account-issuer={{ service_account_issuer }}"
+        state: present
+      notify: Restart kubelet for OIDC issuer
+      when: oidc_apiserver_manifest.stat.exists
+
+    - name: Add the public service account JWKS URI
+      ansible.builtin.lineinfile:
+        path: "{{ kube_apiserver_manifest }}"
+        insertafter: "^    - --service-account-issuer={{ kube_apiserver_internal_issuer | regex_escape }}$"
+        line: "    - --service-account-jwks-uri={{ service_account_jwks_uri }}"
+        state: present
+      notify: Restart kubelet for OIDC issuer
+      when: oidc_apiserver_manifest.stat.exists
+
+  handlers:
+    - name: Restart kubelet for OIDC issuer
+      ansible.builtin.systemd:
+        name: kubelet
+        state: restarted
