@@ -5,9 +5,9 @@ metadata:
   namespace: argocd
 spec:
   targetRefs:
-  - kind: Service
-    name: argocd-server
-    group: ""
+    - kind: Service
+      name: argocd-server
+      group: ""
   validation:
     hostname: argocd-server.argocd.svc.cluster.local
     wellKnownCACertificates: System

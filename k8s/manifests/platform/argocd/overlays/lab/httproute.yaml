@@ -5,22 +5,22 @@ metadata:
   namespace: argocd
 spec:
   parentRefs:
-  - name: argocd
-    namespace: argocd
-    kind: ListenerSet
-    group: gateway.networking.k8s.io
-    sectionName: argocd-https
-  hostnames:
-  - "argocd.homelab.jenniferpweir.com"
-  rules:
-  - backendRefs:
-    - group: ""
-      kind: Service
-      name: argocd-server
+    - name: argocd
       namespace: argocd
-      port: 443
-      weight: 1
-    matches:
-      - path:
-          type: PathPrefix
-          value: /
+      kind: ListenerSet
+      group: gateway.networking.k8s.io
+      sectionName: argocd-https
+  hostnames:
+    - "argocd.homelab.jenniferpweir.com"
+  rules:
+    - backendRefs:
+        - group: ""
+          kind: Service
+          name: argocd-server
+          namespace: argocd
+          port: 443
+          weight: 1
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
