@@ -1,0 +1,25 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: ListenerSet
+metadata:
+  name: argocd
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  parentRef:
+    name: web-gateway
+    namespace: gateway-infra
+    kind: Gateway
+    group: gateway.networking.k8s.io
+  listeners:
+    - name: argocd-https
+      protocol: HTTPS
+      port: 443
+      hostname: "argocd.homelab.jenniferpweir.com"
+      allowedRoutes:
+        namespaces:
+          from: Same
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: argocd-certificate-secret
