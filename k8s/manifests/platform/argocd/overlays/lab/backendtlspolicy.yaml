@@ -3,6 +3,8 @@ kind: BackendTLSPolicy
 metadata:
   name: argocd-backend-tls
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   targetRefs:
     - kind: Service
