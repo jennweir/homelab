@@ -3,7 +3,8 @@ repos:
     rev: v1.35.1
     hooks:
       - id: yamllint
-        args: [--config-file, .github/linters/.yamllint.yaml, --format, parsable]
+        args:
+          [--config-file, .github/linters/.yamllint.yaml, --format, parsable]
         types: [yaml]
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
