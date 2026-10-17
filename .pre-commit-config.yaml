@@ -3,7 +3,8 @@ repos:
     rev: v1.35.1
     hooks:
       - id: yamllint
-        args: [--config-file, .github/linters/.yamllint.yaml, --format, parsable]
+        args:
+          [--config-file, .github/linters/.yamllint.yaml, --format, parsable]
         types: [yaml]
 
   - repo: https://github.com/shellcheck-py/shellcheck-py
@@ -31,3 +32,4 @@ repos:
         args: [--unsafe]
       - id: check-merge-conflict
       - id: detect-private-key
+        exclude: ^k8s/manifests/platform/external-secrets-operator/components/v2\.12\.0/customresourcedefinition\.yaml$
