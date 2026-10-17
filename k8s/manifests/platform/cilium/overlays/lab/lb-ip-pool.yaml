@@ -1,0 +1,10 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: lab-ip-pool
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  blocks:
+    - start: "192.168.0.225"
+      stop: "192.168.0.234"
