@@ -1,7 +1,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+  - ../../base
+  - ../../components/cilium
   - ../../components/gateway
   - ../../components/gateway-api/v1.6.1
   - lb-ip-pool.yaml
-  - l2-announcement-policy.yaml

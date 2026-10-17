@@ -12,17 +12,22 @@ helm repo update
 #     > cilium.yaml
 
 # Cilium as a gateway-api provider
-# todo: hubble.tls.auto.method=certmanager
-helm template cilium cilium/cilium --version 1.20.0 \
+helm template cilium cilium/cilium --version 1.20.3 \
     --namespace kube-system \
     --set hubble.enabled=true \
-    --set hubble.tls.enabled=false \
+    --set hubble.tls.enabled=true \
+    --set hubble.tls.auto.method=certmanager \
+    --set hubble.tls.auto.certManagerIssuerRef.group="cert-manager.io" \
+    --set hubble.tls.auto.certManagerIssuerRef.kind="Issuer" \
+    --set hubble.tls.auto.certManagerIssuerRef.name="hubble-issuer" \
     --set kubeProxyReplacement=true \
     --set gatewayAPI.enabled=true \
     --set l2announcements.enabled=true \
     --api-versions='gateway.networking.k8s.io/v1/GatewayClass' \
     --set k8sServiceHost=192.168.0.201 \
-    --set k8sServicePort=6443 > cilium.yaml
+    --set k8sServicePort=6443 \
+    | sed '/helm.sh\/chart:/d' \
+    > cilium.yaml
 
 if command -v gsed >/dev/null 2>&1; then
     SED="gsed"
