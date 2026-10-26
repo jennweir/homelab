@@ -190,6 +190,16 @@
         that: crio_socket.stat.exists
         fail_msg: CRI-O is installed but its socket was not created.
 
+    - name: Ensure the base directory exists for Rook
+      ansible.builtin.file:
+        path: /var/lib/rook
+        state: directory
+        mode: "0755"
+
+    - name: Apply the SELinux container label recursively to /var/lib/rook
+      ansible.builtin.command: chcon -Rt container_file_t /var/lib/rook
+      changed_when: false
+
     - name: Display manual next steps
       ansible.builtin.debug:
         msg: >-
