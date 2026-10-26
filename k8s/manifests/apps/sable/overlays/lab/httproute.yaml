@@ -11,7 +11,7 @@ spec:
       group: gateway.networking.k8s.io
       sectionName: sable-https
   hostnames:
-    - "sable.homelab.jenniferpweir.com"
+    - "dns.homelab.jenniferpweir.com"
   rules:
     - backendRefs:
         - group: ""
