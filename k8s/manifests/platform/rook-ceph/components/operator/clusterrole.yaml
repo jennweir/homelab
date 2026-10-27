@@ -1,0 +1,1006 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ceph-csi-cephconnection-viewer-role
+  labels:
+    app.kubernetes.io/name: ceph-csi
+    app.kubernetes.io/instance: rook-ceph
+rules:
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - cephconnections
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - cephconnections/status
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ceph-csi-cephconnections-editor-role
+  labels:
+    app.kubernetes.io/name: ceph-csi
+    app.kubernetes.io/instance: rook-ceph
+rules:
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - cephconnections
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - cephconnections/status
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ceph-csi-clientprofile-viewer-role
+  labels:
+    app.kubernetes.io/name: ceph-csi
+    app.kubernetes.io/instance: rook-ceph
+rules:
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofiles
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofiles/status
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ceph-csi-clientprofilemapping-editor-role
+  labels:
+    app.kubernetes.io/name: ceph-csi
+    app.kubernetes.io/instance: rook-ceph
+rules:
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofilemappings
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofilemappings/status
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ceph-csi-clientprofilemapping-viewer-role
+  labels:
+    app.kubernetes.io/name: ceph-csi
+    app.kubernetes.io/instance: rook-ceph
+rules:
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofilemappings
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofilemappings/status
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ceph-csi-clientprofilereplication-admin-role
+  labels:
+    app.kubernetes.io/name: ceph-csi
+    app.kubernetes.io/instance: rook-ceph
+  annotations:
+    gitops-ci.k8s.io/exempt-rbac-wildcards: "verbs"
+rules:
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofilereplications
+    verbs:
+      - "*"
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofilereplications/status
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ceph-csi-clientprofilereplication-editor-role
+  labels:
+    app.kubernetes.io/name: ceph-csi
+    app.kubernetes.io/instance: rook-ceph
+rules:
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofilereplications
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofilereplications/status
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ceph-csi-clientprofilereplication-viewer-role
+  labels:
+    app.kubernetes.io/name: ceph-csi
+    app.kubernetes.io/instance: rook-ceph
+rules:
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofilereplications
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofilereplications/status
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ceph-csi-clientprofiles-editor-role
+  labels:
+    app.kubernetes.io/name: ceph-csi
+    app.kubernetes.io/instance: rook-ceph
+rules:
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofiles
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofiles/status
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ceph-csi-driver-editor-role
+  labels:
+    app.kubernetes.io/name: ceph-csi
+    app.kubernetes.io/instance: rook-ceph
+rules:
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - drivers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - drivers/status
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ceph-csi-driver-viewer-role
+  labels:
+    app.kubernetes.io/name: ceph-csi
+    app.kubernetes.io/instance: rook-ceph
+rules:
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - drivers
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - drivers/status
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ceph-csi-manager-role
+  labels:
+    app.kubernetes.io/name: ceph-csi
+    app.kubernetes.io/instance: rook-ceph
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - services
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - list
+      - watch
+  - apiGroups:
+      - apps
+    resources:
+      - daemonsets
+      - deployments
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - cephconnections
+    verbs:
+      - delete
+      - get
+      - list
+      - update
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofilemappings
+      - clientprofilereplications
+      - clientprofiles
+      - drivers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofilemappings/finalizers
+      - clientprofilereplications/finalizers
+      - clientprofiles/finalizers
+      - drivers/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofilemappings/status
+      - clientprofilereplications/status
+      - clientprofiles/status
+      - drivers/status
+    verbs:
+      - get
+      - patch
+      - update
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - operatorconfigs
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - networking.k8s.io
+    resources:
+      - networkpolicies
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - csidrivers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ceph-csi-metrics-auth-role
+  labels:
+    app.kubernetes.io/name: ceph-csi
+    app.kubernetes.io/instance: rook-ceph
+rules:
+  - apiGroups:
+      - authentication.k8s.io
+    resources:
+      - tokenreviews
+    verbs:
+      - create
+  - apiGroups:
+      - authorization.k8s.io
+    resources:
+      - subjectaccessreviews
+    verbs:
+      - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ceph-csi-metrics-reader
+  labels:
+    app.kubernetes.io/name: ceph-csi
+    app.kubernetes.io/instance: rook-ceph
+rules:
+  - nonResourceURLs:
+      - /metrics
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ceph-csi-operatorconfig-editor-role
+  labels:
+    app.kubernetes.io/name: ceph-csi
+    app.kubernetes.io/instance: rook-ceph
+rules:
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - operatorconfigs
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - operatorconfigs/status
+    verbs:
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ceph-csi-operatorconfig-viewer-role
+  labels:
+    app.kubernetes.io/name: ceph-csi
+    app.kubernetes.io/instance: rook-ceph
+rules:
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - operatorconfigs
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - operatorconfigs/status
+    verbs:
+      - get
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rook-ceph-system
+  labels:
+    operator: rook
+    storage-backend: ceph
+    app.kubernetes.io/name: rook-ceph
+    app.kubernetes.io/instance: rook-ceph
+    app.kubernetes.io/part-of: rook-ceph-operator
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - pods/log
+    verbs:
+      - get
+      - list
+  - apiGroups:
+      - ""
+    resources:
+      - pods/exec
+    verbs:
+      - create
+  - apiGroups:
+      - csiaddons.openshift.io
+    resources:
+      - networkfences
+    verbs:
+      - create
+      - get
+      - update
+      - delete
+      - watch
+      - list
+      - deletecollection
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - get
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - cephconnections
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - update
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - clientprofiles
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - update
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - operatorconfigs
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - update
+      - watch
+  - apiGroups:
+      - csi.ceph.io
+    resources:
+      - drivers
+    verbs:
+      - create
+      - delete
+      - get
+      - list
+      - update
+      - watch
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rook-ceph-cluster-mgmt
+  labels:
+    operator: rook
+    storage-backend: ceph
+    app.kubernetes.io/name: rook-ceph
+    app.kubernetes.io/instance: rook-ceph
+    app.kubernetes.io/part-of: rook-ceph-operator
+rules:
+  - apiGroups:
+      - ""
+      - apps
+      - extensions
+    resources:
+      - secrets
+      - pods
+      - pods/log
+      - services
+      - configmaps
+      - deployments
+      - daemonsets
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+      - create
+      - update
+      - delete
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rook-ceph-global
+  labels:
+    operator: rook
+    storage-backend: ceph
+    app.kubernetes.io/name: rook-ceph
+    app.kubernetes.io/instance: rook-ceph
+    app.kubernetes.io/part-of: rook-ceph-operator
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+      - nodes
+      - secrets
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+  - apiGroups:
+      - ""
+      - discovery.k8s.io
+    resources:
+      - events
+      - persistentvolumes
+      - persistentvolumeclaims
+      - endpoints
+      - services
+      - endpointslices
+      - endpointslices/restricted
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+      - create
+      - update
+      - delete
+  - apiGroups:
+      - events.k8s.io
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+      - update
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+      - cronjobs
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - delete
+      - deletecollection
+  - apiGroups:
+      - ceph.rook.io
+    resources:
+      - cephclients
+      - cephclusters
+      - cephblockpools
+      - cephfilesystems
+      - cephnfses
+      - cephnvmeofgateways
+      - cephobjectstores
+      - cephobjectstoreusers
+      - cephobjectstoreaccounts
+      - cephobjectrealms
+      - cephobjectzonegroups
+      - cephobjectzones
+      - cephbuckettopics
+      - cephbucketnotifications
+      - cephrbdmirrors
+      - cephfilesystemmirrors
+      - cephfilesystemsubvolumegroups
+      - cephblockpoolradosnamespaces
+      - cephcosidrivers
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - patch
+  - apiGroups:
+      - ceph.rook.io
+    resources:
+      - cephclients/status
+      - cephclusters/status
+      - cephblockpools/status
+      - cephfilesystems/status
+      - cephnfses/status
+      - cephnvmeofgateways/status
+      - cephobjectstores/status
+      - cephobjectstoreusers/status
+      - cephobjectstoreaccounts/status
+      - cephobjectrealms/status
+      - cephobjectzonegroups/status
+      - cephobjectzones/status
+      - cephbuckettopics/status
+      - cephbucketnotifications/status
+      - cephrbdmirrors/status
+      - cephfilesystemmirrors/status
+      - cephfilesystemsubvolumegroups/status
+      - cephblockpoolradosnamespaces/status
+    verbs:
+      - update
+  - apiGroups:
+      - ceph.rook.io
+    resources:
+      - cephclients/finalizers
+      - cephclusters/finalizers
+      - cephblockpools/finalizers
+      - cephfilesystems/finalizers
+      - cephnfses/finalizers
+      - cephnvmeofgateways/finalizers
+      - cephobjectstores/finalizers
+      - cephobjectstoreusers/finalizers
+      - cephobjectstoreaccounts/finalizers
+      - cephobjectrealms/finalizers
+      - cephobjectzonegroups/finalizers
+      - cephobjectzones/finalizers
+      - cephbuckettopics/finalizers
+      - cephbucketnotifications/finalizers
+      - cephrbdmirrors/finalizers
+      - cephfilesystemmirrors/finalizers
+      - cephfilesystemsubvolumegroups/finalizers
+      - cephblockpoolradosnamespaces/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - policy
+      - apps
+      - extensions
+    resources:
+      - poddisruptionbudgets
+      - deployments
+      - replicasets
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - delete
+      - deletecollection
+  - apiGroups:
+      - apps
+    resources:
+      - deployments/finalizers
+    verbs:
+      - update
+  - apiGroups:
+      - healthchecking.openshift.io
+    resources:
+      - machinedisruptionbudgets
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - delete
+  - apiGroups:
+      - machine.openshift.io
+    resources:
+      - machines
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - delete
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - csidrivers
+    verbs:
+      - create
+      - delete
+      - get
+      - update
+  - apiGroups:
+      - k8s.cni.cncf.io
+    resources:
+      - network-attachment-definitions
+    verbs:
+      - get
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rook-ceph-mgr-cluster
+  labels:
+    operator: rook
+    storage-backend: ceph
+    app.kubernetes.io/name: rook-ceph
+    app.kubernetes.io/instance: rook-ceph
+    app.kubernetes.io/part-of: rook-ceph-operator
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+      - nodes
+      - persistentvolumes
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+      - list
+      - get
+      - watch
+  - apiGroups:
+      - events.k8s.io
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+      - update
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+    verbs:
+      - get
+      - list
+      - watch
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rook-ceph-mgr-system
+  labels:
+    operator: rook
+    storage-backend: ceph
+    app.kubernetes.io/name: rook-ceph
+    app.kubernetes.io/instance: rook-ceph
+    app.kubernetes.io/part-of: rook-ceph-operator
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - get
+      - list
+      - watch
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rook-ceph-object-bucket
+  labels:
+    operator: rook
+    storage-backend: ceph
+    app.kubernetes.io/name: rook-ceph
+    app.kubernetes.io/instance: rook-ceph
+    app.kubernetes.io/part-of: rook-ceph-operator
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+      - configmaps
+    verbs:
+      - get
+      - create
+      - update
+      - delete
+  - apiGroups:
+      - storage.k8s.io
+    resources:
+      - storageclasses
+    verbs:
+      - get
+  - apiGroups:
+      - objectbucket.io
+    resources:
+      - objectbucketclaims
+    verbs:
+      - list
+      - watch
+      - get
+      - update
+  - apiGroups:
+      - objectbucket.io
+    resources:
+      - objectbuckets
+    verbs:
+      - list
+      - watch
+      - get
+      - create
+      - update
+      - delete
+  - apiGroups:
+      - objectbucket.io
+    resources:
+      - objectbucketclaims/status
+      - objectbuckets/status
+    verbs:
+      - update
+  - apiGroups:
+      - objectbucket.io
+    resources:
+      - objectbucketclaims/finalizers
+      - objectbuckets/finalizers
+    verbs:
+      - update
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rook-ceph-osd
+  labels:
+    operator: rook
+    storage-backend: ceph
+    app.kubernetes.io/name: rook-ceph
+    app.kubernetes.io/instance: rook-ceph
+    app.kubernetes.io/part-of: rook-ceph-operator
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - nodes
+    verbs:
+      - get
+      - list
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: objectstorage-provisioner-role
+  labels:
+    app.kubernetes.io/part-of: container-object-storage-interface
+    app.kubernetes.io/component: driver-ceph
+    app.kubernetes.io/name: cosi-driver-ceph
+rules:
+  - apiGroups:
+      - objectstorage.k8s.io
+    resources:
+      - buckets
+      - bucketaccesses
+      - bucketclaims
+      - bucketaccessclasses
+      - buckets/status
+      - bucketaccesses/status
+      - bucketclaims/status
+      - bucketaccessclasses/status
+    verbs:
+      - get
+      - list
+      - watch
+      - update
+      - create
+      - delete
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - get
+      - watch
+      - list
+      - delete
+      - update
+      - create
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+      - events
+    verbs:
+      - get
+      - delete
+      - update
+      - create
+  - apiGroups:
+      - events.k8s.io
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+      - update

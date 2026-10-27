@@ -1,0 +1,117 @@
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+resources:
+  - ../../base
+  - ../../components/cluster
+  - ../../components/csi-driver
+  - ../../components/operator
+patches:
+  - path: device-ids.yaml
+    target:
+      kind: CephCluster
+      name: rook-ceph
+  - path: selinux-env.yaml
+    target:
+      kind: Deployment
+      name: rook-ceph-operator
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/resources/requests/cpu
+        value: 50m
+    target:
+      kind: Deployment
+      name: rook-ceph-operator
+  - patch: |-
+      - op: replace
+        path: /spec/resources/mon/requests/cpu
+        value: 50m
+      - op: replace
+        path: /spec/resources/mon/requests/memory
+        value: 256Mi
+      - op: replace
+        path: /spec/resources/mon/limits/memory
+        value: 1Gi
+      - op: replace
+        path: /spec/resources/osd/requests/cpu
+        value: 100m
+      - op: replace
+        path: /spec/resources/osd/requests/memory
+        value: 512Mi
+      - op: replace
+        path: /spec/resources/osd/limits/cpu
+        value: 400m
+      - op: replace
+        path: /spec/resources/osd/limits/memory
+        value: 2Gi
+      - op: replace
+        path: /spec/resources/mgr/requests/cpu
+        value: 50m
+      - op: replace
+        path: /spec/resources/mgr/requests/memory
+        value: 128Mi
+      - op: replace
+        path: /spec/resources/mgr/limits/memory
+        value: 512Mi
+      - op: replace
+        path: /spec/resources/mgr-sidecar/requests/cpu
+        value: 25m
+      - op: replace
+        path: /spec/resources/mgr-sidecar/requests/memory
+        value: 20Mi
+      - op: replace
+        path: /spec/resources/mgr-sidecar/limits/memory
+        value: 50Mi
+      - op: replace
+        path: /spec/resources/crashcollector/requests/cpu
+        value: 25m
+      - op: replace
+        path: /spec/resources/crashcollector/requests/memory
+        value: 30Mi
+      - op: replace
+        path: /spec/resources/crashcollector/limits/memory
+        value: 30Mi
+      - op: replace
+        path: /spec/resources/logcollector/requests/cpu
+        value: 25m
+      - op: replace
+        path: /spec/resources/logcollector/requests/memory
+        value: 30Mi
+      - op: replace
+        path: /spec/resources/logcollector/limits/memory
+        value: 256Mi
+      - op: replace
+        path: /spec/resources/cleanup/requests/cpu
+        value: 50m
+      - op: replace
+        path: /spec/resources/cleanup/requests/memory
+        value: 50Mi
+      - op: replace
+        path: /spec/resources/cleanup/limits/memory
+        value: 512Mi
+      - op: replace
+        path: /spec/resources/cmd-reporter/requests/cpu
+        value: 50m
+      - op: replace
+        path: /spec/resources/cmd-reporter/requests/memory
+        value: 50Mi
+      - op: replace
+        path: /spec/resources/cmd-reporter/limits/memory
+        value: 512Mi
+      - op: replace
+        path: /spec/resources/exporter/requests/cpu
+        value: 10m
+      - op: replace
+        path: /spec/resources/exporter/requests/memory
+        value: 20Mi
+      - op: replace
+        path: /spec/resources/exporter/limits/memory
+        value: 64Mi
+      - op: replace
+        path: /spec/resources/prepareosd/requests/cpu
+        value: 50m
+      - op: replace
+        path: /spec/resources/prepareosd/requests/memory
+        value: 50Mi
+    target:
+      kind: CephCluster
+      name: rook-ceph

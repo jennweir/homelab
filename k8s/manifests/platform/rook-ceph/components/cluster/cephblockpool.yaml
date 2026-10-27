@@ -1,0 +1,11 @@
+kind: CephBlockPool
+apiVersion: ceph.rook.io/v1
+metadata:
+  name: ceph-blockpool
+  namespace: rook-ceph
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  failureDomain: host
+  replicated:
+    size: 3

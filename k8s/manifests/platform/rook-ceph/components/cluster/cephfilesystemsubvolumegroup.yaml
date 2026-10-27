@@ -1,0 +1,12 @@
+kind: CephFilesystemSubVolumeGroup
+apiVersion: ceph.rook.io/v1
+metadata:
+  name: ceph-filesystem-csi
+  namespace: rook-ceph
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  name: csi
+  filesystemName: ceph-filesystem
+  pinning:
+    distributed: 1
