@@ -9,16 +9,15 @@ resources:
   - certificate.yaml
   - httproute.yaml
   - listenerset.yaml
+    # request stable IP from the Cilium LB IPAM pool so DNS clients can expect it to stay the same
 patches:
-  # request stable IP from the Cilium LB IPAM pool so DNS clients can expect it to stay the same
-  - target:
-      group: ""
-      version: v1
-      kind: Service
-      name: sable-dns
-      namespace: sable
-    patch: |-
+  - patch: |-
       - op: add
         path: /metadata/annotations
         value:
           io.cilium/lb-ipam-ips: "192.168.0.226"
+    target:
+      kind: Service
+      name: sable-dns
+      namespace: sable
+      version: v1
