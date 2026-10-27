@@ -13,6 +13,10 @@ spec:
       labels:
         app: sable
     spec:
+      enableServiceLinks: false
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      automountServiceAccountToken: false
       # the image runs as "nonroot" but ships no /etc/passwd, so runAsUser must be numeric for runAsNonRoot to pass admission; fsGroup makes the emptyDir volume writable
       securityContext:
         runAsNonRoot: true
@@ -29,6 +33,13 @@ spec:
       containers:
         - name: sable
           image: ghcr.io/drudge/sable:1.7.2@sha256:27731daa5467fa8a455f79ccd0d0af83e9afaed54540b1e075e1fdda5f824740
+          resources:
+            requests:
+              cpu: 50m
+              memory: 50Mi
+            limits:
+              cpu: 100m
+              memory: 100Mi
           envFrom:
             - configMapRef:
                 name: sable
@@ -54,6 +65,16 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 5
             failureThreshold: 3
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities:
+              drop:
+                - ALL
+            seccompProfile:
+              type: RuntimeDefault
+            readOnlyRootFilesystem: true
+            privileged: false
           volumeMounts:
             - name: sable-data-volume
               mountPath: /data
