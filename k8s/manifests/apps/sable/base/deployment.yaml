@@ -28,7 +28,7 @@ spec:
           - 9.9.9.9
       containers:
         - name: sable
-          image: ghcr.io/drudge/sable:1.7.1@sha256:9f09002ea2c37170e601ca707c3273f59a1883d8c825ad233b8d1ef554495652
+          image: ghcr.io/drudge/sable:1.7.2@sha256:27731daa5467fa8a455f79ccd0d0af83e9afaed54540b1e075e1fdda5f824740
           envFrom:
             - configMapRef:
                 name: sable
