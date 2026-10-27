@@ -27,6 +27,7 @@ spec:
       schedulerName: default-scheduler
       dnsPolicy: ClusterFirst
       automountServiceAccountToken: true
+      enableServiceLinks: false
       containers:
         - args:
             - --leader-elect
@@ -73,6 +74,7 @@ spec:
             seccompProfile:
               type: RuntimeDefault
             readOnlyRootFilesystem: true
+            privileged: false
       imagePullSecrets: []
       nodeSelector: {}
       priorityClassName:

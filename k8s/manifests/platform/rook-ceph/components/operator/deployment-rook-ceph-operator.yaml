@@ -30,6 +30,7 @@ spec:
       schedulerName: default-scheduler
       dnsPolicy: ClusterFirst
       automountServiceAccountToken: true
+      enableServiceLinks: false
       containers:
         - name: rook-ceph-operator
           image: docker.io/rook/ceph:v1.21.0@sha256:2c3a65786d3cc85ba15d7f258461c0bf392c6a6ee19dde8011259b8d34eeedd0
@@ -47,6 +48,8 @@ spec:
             runAsUser: 2016
             seccompProfile:
               type: RuntimeDefault
+            privileged: false
+            allowPrivilegeEscalation: false
           volumeMounts:
             - mountPath: /var/lib/rook
               name: rook-config
