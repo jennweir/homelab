@@ -8,5 +8,4 @@ spec:
   source:
     type: Image
     image:
-      ref: quay.io/operatorhubio/catalog:latest
-      pollIntervalMinutes: 10
+      ref: quay.io/operatorhubio/catalog@sha256:ff4c8f71b29ba4435317c1142527a2afb634782c42e895d88cd87a93c111c347
