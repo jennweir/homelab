@@ -62,7 +62,8 @@ spec:
               subPath: sable.toml
       volumes:
         - name: sable-data-volume
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: sable-data
         - name: sable-toml-config
           configMap:
             name: sable-toml
