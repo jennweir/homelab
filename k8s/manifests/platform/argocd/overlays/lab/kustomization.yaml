@@ -4,3 +4,7 @@ resources:
   - ../../base
   - ../../components
   - ../../operator/olm-v0/v0.18.0
+  - backendtlspolicy.yaml
+  - certificate.yaml
+  - listenerset.yaml
+  - httproute.yaml
