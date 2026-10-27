@@ -1,0 +1,410 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sable
+  namespace: sable
+data:
+  sable.toml: |
+    [server]
+    http_listen = "0.0.0.0:5380"
+    dns_listen = ["0.0.0.0:8053"]
+    shutdown_timeout = "15s"
+
+    [database]
+    driver = "sqlite"
+    dsn = "data/sable.db"
+
+    [resolver]
+    # Recursion is restricted even when DNS listeners bind all interfaces.
+    recursion = "private"
+    max_concurrent = 1024
+    max_concurrent_per_client = 64
+    # "forward" uses the upstreams below. "recursive" resolves directly from the
+    # DNS root while still honoring conditional routes and forwarder zones.
+    mode = "forward"
+    forwarders = ["1.1.1.1:53", "9.9.9.9:53"]
+    # root_hints = ["198.41.0.4:53", "170.247.170.2:53"]
+    # The budget for the whole query. In forward mode it is divided evenly among the
+    # forwarders that have not been tried yet, so one stalled upstream cannot spend
+    # the pool's time and leave the rest of it unreachable. In recursive mode a
+    # cold alias chain through several DNS providers can need close to 3s.
+    timeout = "3s"
+    # Attempts per upstream before failover, and how long each attempt waits. A
+    # dropped UDP packet on a lossy path is retried instead of failing the query.
+    # An upstream only gets a second attempt if its share of timeout has room for
+    # one, so raise timeout to keep retries as well as failover across a long
+    # forwarder list. In recursive mode, raise timeout if you also raise these so
+    # the full delegation chain still fits. Authoritative servers get at most 800ms
+    # each before the zone's next server is asked; only the last one left gets the
+    # full retries.
+    retries = 2
+    retry_timeout = "1500ms"
+    cache_size = 65536
+    cache_minimum_ttl = 10
+    cache_maximum_ttl = 604800
+    cache_negative_ttl = 300
+    cache_failure_ttl = 10
+    save_cache = false
+    serve_stale = false
+    cache_stale_ttl = 259200
+    cache_stale_answer_ttl = 30
+    cache_stale_reset_ttl = 30
+    cache_stale_max_wait = "1800ms"
+    cache_prefetch_minimum_ttl = 2
+    cache_prefetch_trigger_ttl = 9
+    cache_prefetch_sample_interval = "5m"
+    cache_prefetch_hits_per_hour = 30
+    dnssec_validation = true
+    dnssec_trust_anchor_updates = true
+    # Recursive mode asks each zone only for the next label of a name (RFC 9156).
+    # Turn off only if a DNS provider fails with minimized questions.
+    qname_minimization = true
+    # Empty trust anchors use Sable's bundled IANA root KSK set. Custom anchors
+    # accept an owner followed by DS or DNSKEY RDATA.
+    # dnssec_trust_anchors = [". DS 20326 8 2 E06D44B80B8F1D39A95C0B0D7C65D08458E880409BBC683457104237C7F8EC8D"]
+    # Negative trust anchors are explicit local exceptions for broken private zones.
+    # Forwarder and stub zones carry their own DNSSEC validation switch, so prefer
+    # that when only one forwarded zone is unsigned.
+    # dnssec_negative_trust_anchors = ["legacy.corp.example"]
+
+    # [[resolver.routes]]
+    # domain = "internal.example"
+    # forwarders = ["192.0.2.53:53"]
+
+    # [[resolver.hosts]]
+    # name = "router.home.arpa"
+    # addresses = ["192.168.1.1", "fd00::1"]
+    # ttl = 300
+
+    # Authoritative zones and records are managed through the Sable console or zone API.
+    # They are stored transactionally in the configured SQLite or PostgreSQL database.
+    # Zone files are used only for import and export.
+    #
+    # TSIG keys are managed from Settings > TSIG in the console. Only the name and
+    # algorithm live here; the shared secret is held in the encrypted vault next to
+    # the DNSSEC and ACME material, so this file and its backups never carry it.
+    # A secret written below is moved into the vault on the next start and removed
+    # from the file, which is how an upgrade from an older release carries over.
+    # [[tsig_keys]]
+    # name = "transfer-example"
+    # algorithm = "hmac-sha256"
+
+    [blocking]
+    enabled = true
+    domains = ["example.invalid"]
+    allowed_domains = []
+    update_interval = "1d"
+    response_type = "nxdomain"
+    response_ttl = 30
+    custom_addresses = []
+    allow_txt_report = true
+
+    # [[blocking.lists]]
+    # name = "local"
+    # path = "lists/block.txt"
+    # format = "auto"
+
+    # A rule set gives some devices their own lists, apps, and domains. A device
+    # joins one through its [[clients]] entry's rule_set. apps block every domain
+    # of an app Insights knows, by its ID.
+    # [[blocking.rule_sets]]
+    # name = "Kids"
+    # lists = ["local"]
+    # apps = ["youtube", "tiktok"]
+    # domains = ["coolmathgames.com"]
+
+    # A hold blocks everything but allowed domains for one device, until a time or
+    # until it is removed.
+    # [[blocking.holds]]
+    # mac = "da:a1:19:00:00:01"
+    # until = 2026-10-08T20:00:00-04:00
+
+    # Remote subscriptions are downloaded into Sable's data directory and updated
+    # automatically. The path is optional for remote lists.
+    # [[blocking.lists]]
+    # name = "OISD Big"
+    # url = "https://big.oisd.nl/"
+    # format = "auto"
+
+    [query_log]
+    enabled = true
+    buffer_size = 8192
+    batch_size = 256
+    flush_interval = "250ms"
+    retention = "30d"
+
+    # Insights records which devices use Sable and what hardware they are, and
+    # flags changes. Set enabled = false to stop all of it and hide Insights.
+    # [insights]
+    # enabled = true
+    #
+    # What Insights does with each kind of finding. Each table is named for the
+    # kind: went_quiet is devices.went-quiet. mode is "alert" to show it and send
+    # each new one as an alert, "show" to only show it, or "off" to stop looking for
+    # it. Limits left out keep their defaults. Set these from the bell at the top of
+    # Insights; docs/configuration.md lists every kind and its limits.
+    # [insights.findings.went_quiet]
+    # mode = "alert"
+    # minimum_daily_lookups = 50
+    #
+    # [insights.findings.traffic_spike]
+    # mode = "show"
+    # factor = 3.0
+    # minimum_lookups = 500
+
+    [server_log]
+    enabled = true
+    level = "info"
+    buffer_size = 4096
+    batch_size = 128
+    flush_interval = "1s"
+    retention = "60d"
+
+    [statistics]
+    retention = "1y"
+
+    [backup]
+    enabled = false
+    directory = "data/backups"
+    interval = "1d"
+    run_at = "02:00"
+    retention_count = 7
+
+    [encrypted_dns]
+    dot_listen = []
+    doh_listen = []
+    doq_listen = []
+    certificate_mode = "manual"
+    certificate_file = ""
+    private_key_file = ""
+    minimum_tls_version = "1.3"
+
+    # For managed certificates, switch certificate_mode to "acme" and configure
+    # provider credentials in Settings → Protocols. Credentials are encrypted in
+    # the secret vault and are never written here.
+    [encrypted_dns.acme]
+    email = ""
+    domains = []
+    directory_url = "https://acme-v02.api.letsencrypt.org/directory"
+    dns_provider = ""
+    dns_zone = ""
+    storage_dir = "data/tls/acme"
+    renew_before = "30d"
+
+    # Dynamic DNS publishes this deployment's public addresses into external DNS.
+    # Set it up from Integrations in the console so provider credentials are sealed
+    # in the shared external-DNS vault instead of written here. The same credentials
+    # can be reused by ACME DNS-01 when their permissions cover both record sets.
+    [dynamic_dns]
+    enabled = false
+    interval = "5m"
+    ipv4_url = "https://api.ipify.org"
+    ipv6_url = "https://api6.ipify.org"
+
+    # Add one publisher per external provider. A publisher can contain records from
+    # several zones, and credentials remain in the encrypted provider vault.
+    # [[dynamic_dns.publishers]]
+    # provider = "cloudflare"
+    #
+    # Sable owns the complete A and/or AAAA RRset for each configured name. Records
+    # in the same zone share their address-family and TTL policy. Pausing or removing
+    # the integration leaves its last published external records intact. GoDaddy and
+    # Porkbun require a TTL of at least 600 seconds.
+    # [[dynamic_dns.publishers.records]]
+    # zone = "example.com"
+    # name = "home.example.com"
+    # ipv4 = true
+    # ipv6 = false
+    # ttl = 600
+    #
+    # [[dynamic_dns.publishers.records]]
+    # zone = "example.net"
+    # name = "vpn.example.net"
+    # ipv4 = true
+    # ipv6 = true
+    # ttl = 600
+
+    # Alerts. Sable sends each new alert once to every destination that wants its
+    # group, from the node leading the cluster. Set these up in Settings > Alerts.
+    # Destination URLs, Pushover keys, and header values live in the encrypted
+    # vault; any written here move there the next time Sable starts. paused = true
+    # stops sending but keeps every destination.
+    [alerts]
+    paused = false
+
+    # Which groups send alerts. backups is "failures", "all" to hear about every
+    # finished backup too, or "off". server covers certificate renewals, secondary
+    # zones, and DNSSEC keys.
+    [alerts.send]
+    insights = true
+    cluster = true
+    updates = true
+    integrations = true
+    backups = "failures"
+    server = true
+    sign_ins = false
+
+    # Failed sign-ins on one node alert once they pass this many inside this long.
+    [alerts.sign_ins]
+    after = 5
+    within = "10m"
+
+    # One entry per destination. "json" suits Home Assistant and any JSON endpoint;
+    # "text" posts plain text with a Title header, which suits ntfy; "slack" and
+    # "discord" post rich cards; "pushover" posts to Pushover's API; "browser"
+    # pushes to the browsers turned on in Settings > Alerts. sends limits a
+    # destination to some groups; leave it out to send everything. ntfy_receipt =
+    # true only counts a send when ntfy answers with a message ID.
+    # [[alerts.destinations]]
+    # id = "phone"
+    # name = "Phone"
+    # format = "pushover"
+    # sends = ["cluster", "sign_ins"]
+
+    # UniFi host synchronization. Set this up from Apps in the console: the wizard
+    # discovers the controller's networks, maps each one to a zone, and previews the
+    # records before enabling. Controller credentials are encrypted in the secret
+    # vault and are never written here.
+    [unifi]
+    enabled = false
+    controller_url = "https://192.168.1.1"
+    site = "default"
+    interval = "2m"
+    # "reservations" publishes configured fixed IPs, "active" publishes currently
+    # connected clients. A reservation always wins when both describe one device.
+    sources = ["reservations", "active"]
+    # UniFi consoles ship a self-signed certificate. Pin its issuer here, or accept
+    # the risk with tls_insecure.
+    tls_ca_file = ""
+    tls_insecure = false
+    # How long Sable waits for each controller reply, from 5s to 10m. Leave it out
+    # for the 90s default. Older nodes in a cluster can't read this key, so upgrade
+    # every node before setting it.
+    # timeout = "90s"
+    # Read the controller's clients for Insights even with no network mapped
+    # below, so Sable can point out devices that never use it for DNS.
+    find_devices = false
+
+    # One mapping per UniFi network. Records land in the mapped zone and are owned
+    # by the synchronizer, so hand-authored records in the same zone are never
+    # touched. Reverse zones are derived from the network's own subnet.
+    # [[unifi.networks]]
+    # id = "61f0c1a2b3c4d5e6f7a8b9c0"
+    # name = "IoT"
+    # zone = "iot.example.net"
+    # hostname_template = "{{host}}.{{zone}}"
+    # ttl = 300
+    # reverse = true
+    # enabled = true
+
+    [security]
+    # Hide passkey sign-in and enrollment, keeping saved credentials.
+    # Applies locally on standalone servers and replicates in clusters.
+    # Ensure every account has another sign-in method before setting true.
+    passkeys_disabled = false
+    enabled = true
+    secure_cookies = true
+    session_ttl = "12h"
+    api_token_ttl = "3mo"
+    secret_key_file = "data/sable.key"
+
+    # Sable's MCP server lets AI assistants such as Claude Code, Codex, and Cursor
+    # manage records and blocking over the Model Context Protocol at /mcp. They sign
+    # in with an API token, and the token's groups decide what they may touch. Set
+    # it up from Integrations -> MCP Server in the console. configured stays true
+    # while it is paused.
+    # tools lists the tools assistants are offered. These everyday tools are on
+    # by default; create_zone, delete_zone, the tools that change block lists,
+    # sync_dynamic_dns, search_queries, and search_server_logs wait to be added. A token still needs each tool's grant.
+    [mcp]
+    configured = false
+    enabled = false
+    tools = [
+      "list_zones", "list_records", "add_record", "set_records", "update_record",
+      "delete_record", "check_domain", "allow_domain", "block_domain",
+      "remove_domain_rule", "list_block_lists", "lookup", "purge_cache",
+      "list_findings", "get_version", "get_stats", "get_dynamic_dns",
+      "get_cluster_status",
+    ]
+
+    # Console sign-in through an OpenID Connect provider. Set this up from
+    # Integrations -> Single Sign-On in the console rather than by hand: the wizard
+    # contacts the issuer before saving anything, and seals the client secret in the
+    # encrypted vault, which is why no secret appears here.
+    #
+    # Enabling this adds a button to the sign-in page and takes nobody's password
+    # away. Moving an account to single sign-on only is a per-account switch on the
+    # Administration page, and Sable keeps one administrator able to sign in with a
+    # password or passkey so a problem at the provider cannot lock everyone out.
+    [oidc]
+    enabled = false
+    # display_name = "Pocket ID"
+    # issuer = "https://id.example.com"
+    # client_id = "sable"
+    # Optional override. Left unset, the node derives its own callback from the
+    # address it advertises, so a cluster shares one identical [oidc] section.
+    # redirect_url = "https://dns.example.com/auth/oidc/callback"
+    # scopes = ["openid", "profile", "email", "groups"]
+    # username_claim = "preferred_username"
+    # email_claim = "email"
+    # groups_claim = "groups"
+    # picture_claim = "picture"
+    # Copy the profile picture the provider advertises into Sable, so the console
+    # shows the same face the identity provider does. The image is downloaded once
+    # per sign-in and stored locally rather than linked, because the console only
+    # loads images from its own address and hotlinking would tell the provider
+    # which pages get looked at. PNG, JPEG, and GIF up to 256 KB are accepted.
+    # sync_avatar = true
+    # Ask the UserInfo endpoint for claims the ID token leaves out, which some
+    # providers require before group membership arrives at all.
+    # fetch_userinfo = false
+    # Create an account the first time somebody signs in successfully.
+    # provision = true
+    # Attach a first sign-in to an existing account with the same email, but only
+    # when the provider asserts the address is verified. After that the provider's
+    # subject identifies the person, because an email address can change hands.
+    # link_by_verified_email = true
+    # Reconcile roles from the provider's groups on every sign-in. Only the roles
+    # named below are touched; anything assigned by hand in the console survives.
+    # sync_roles = true
+    # default_roles = ["Auditor"]
+    # rp_initiated_logout = false
+    # discovery_interval = "1h"
+    # clock_skew = "1m"
+
+    # Each mapping grants one Sable role to everyone carrying one provider group.
+    # The group is matched exactly as the provider sends it in groups_claim.
+    # [[oidc.role_mappings]]
+    # group = "dns-admins"
+    # role = "Administrator"
+
+    # Node-local clustering identity. Membership and synchronized state are stored
+    # in data_dir and are never embedded in this TOML file.
+    [cluster]
+    data_dir = "data/cluster"
+    node_name = ""
+    advertise_url = ""
+
+    [updates]
+    # Check for new releases when the console opens after sign-in, and on the
+    # schedule below on the lead node so an update alert goes out. Never installs
+    # automatically.
+    check_on_login = true
+    # How often the lead checks on its own: "hourly", "daily", or "weekly". Daily
+    # and weekly checks run at check_at, HH:MM in this node's local time, and
+    # weekly ones on check_day.
+    check_schedule = "hourly"
+    check_at = "09:00"
+    check_day = "monday"
+    # Set only when an external supervisor (such as Docker with a restart policy)
+    # restarts Sable after it exits. Installed systemd services are detected automatically.
+    restart_managed = false
+    # Include release candidates when looking for a newer Sable release. The
+    # About page writes your choice here, so a server tracking release candidates
+    # keeps finding them after a restart. This setting is local to each node and
+    # is not replicated from the cluster primary.
+    pre_release = false
+
+    [config]
+    watch = true
+    debounce = "250ms"

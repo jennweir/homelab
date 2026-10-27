@@ -3,5 +3,4 @@ kind: Kustomization
 metadata:
   namespace: sable
 resources:
-  - deployment.yaml
-  - service.yaml
+  - namespace.yaml

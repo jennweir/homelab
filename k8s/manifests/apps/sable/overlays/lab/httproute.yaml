@@ -3,6 +3,8 @@ kind: HTTPRoute
 metadata:
   name: sable
   namespace: sable
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   parentRefs:
     - name: sable
@@ -11,7 +13,7 @@ spec:
       group: gateway.networking.k8s.io
       sectionName: sable-https
   hostnames:
-    - "sable.homelab.jenniferpweir.com"
+    - "dns.homelab.jenniferpweir.com"
   rules:
     - backendRefs:
         - group: ""

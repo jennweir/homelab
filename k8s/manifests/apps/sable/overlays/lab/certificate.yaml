@@ -3,10 +3,12 @@ kind: Certificate
 metadata:
   name: sable
   namespace: sable
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   secretName: sable-certificate-secret
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-    - "sable.homelab.jenniferpweir.com"
+    - "dns.homelab.jenniferpweir.com"

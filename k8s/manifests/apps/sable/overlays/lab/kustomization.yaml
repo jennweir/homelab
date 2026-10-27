@@ -4,7 +4,20 @@ metadata:
   namespace: sable
 resources:
   - ../../base
+  - ../../components
   - backendtlspolicy.yaml
   - certificate.yaml
   - httproute.yaml
   - listenerset.yaml
+    # request stable IP from the Cilium LB IPAM pool so DNS clients can expect it to stay the same
+patches:
+  - patch: |-
+      - op: add
+        path: /metadata/annotations
+        value:
+          io.cilium/lb-ipam-ips: "192.168.0.226"
+    target:
+      kind: Service
+      name: sable-dns
+      namespace: sable
+      version: v1
