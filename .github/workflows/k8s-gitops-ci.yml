@@ -22,7 +22,7 @@ jobs:
 
       - name: Install k8s-gitops-ci
         env:
-          VERSION: v0.57.5
+          VERSION: v0.62.13
         run: |
           curl -fsSL -o "/tmp/k8s-gitops-ci_${VERSION#v}_linux_amd64.tar.gz" \
             "https://github.com/ArthurVardevanyan/k8s-gitops-ci/releases/download/${VERSION}/k8s-gitops-ci_${VERSION#v}_linux_amd64.tar.gz"
