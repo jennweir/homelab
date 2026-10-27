@@ -7,7 +7,7 @@ metadata:
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   sourceType: grpc
-  image: quay.io/operatorhubio/catalog@sha256:fb0cfa5d426bd3dea7d25d043488546c1f033d231cc477df2a2a9549307877e5
+  image: quay.io/operatorhubio/catalog@sha256:ff4c8f71b29ba4435317c1142527a2afb634782c42e895d88cd87a93c111c347
   displayName: Community Operators
   publisher: OperatorHub.io
   grpcPodConfig:
