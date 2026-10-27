@@ -5,11 +5,8 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.17.2
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 spec:
   group: csi.ceph.io
   names:
@@ -88,11 +85,8 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.17.2
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 spec:
   group: csi.ceph.io
   names:
@@ -323,11 +317,8 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.17.2
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 spec:
   group: csi.ceph.io
   names:
@@ -408,11 +399,8 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.17.2
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 spec:
   group: csi.ceph.io
   names:
@@ -508,11 +496,8 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.17.2
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 spec:
   group: csi.ceph.io
   names:
@@ -7619,11 +7604,8 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.17.2
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 spec:
   group: csi.ceph.io
   names:

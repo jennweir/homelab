@@ -5,11 +5,8 @@ metadata:
   namespace: rook-ceph
   labels:
     control-plane: controller-manager
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 spec:
   replicas: 1
   selector:
@@ -42,7 +39,7 @@ spec:
               value: ""
             - name: KUBERNETES_CLUSTER_DOMAIN
               value: cluster.local
-          image: quay.io/cephcsi/ceph-csi-operator:v1.1.0@sha256:c42c95c36fa257266571ff7542c3e350bb93b152f8865538c8929eb2e2dbe7c6
+          image: quay.io/cephcsi/ceph-csi-operator:v1.1.0
           livenessProbe:
             httpGet:
               path: /healthz

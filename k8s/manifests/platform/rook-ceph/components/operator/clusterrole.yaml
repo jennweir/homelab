@@ -3,11 +3,8 @@ kind: ClusterRole
 metadata:
   name: ceph-csi-cephconnection-viewer-role
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - csi.ceph.io
@@ -29,11 +26,8 @@ kind: ClusterRole
 metadata:
   name: ceph-csi-cephconnections-editor-role
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - csi.ceph.io
@@ -59,11 +53,8 @@ kind: ClusterRole
 metadata:
   name: ceph-csi-clientprofile-viewer-role
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - csi.ceph.io
@@ -85,11 +76,8 @@ kind: ClusterRole
 metadata:
   name: ceph-csi-clientprofilemapping-editor-role
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - csi.ceph.io
@@ -115,11 +103,8 @@ kind: ClusterRole
 metadata:
   name: ceph-csi-clientprofilemapping-viewer-role
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - csi.ceph.io
@@ -141,11 +126,8 @@ kind: ClusterRole
 metadata:
   name: ceph-csi-clientprofilereplication-admin-role
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - csi.ceph.io
@@ -165,11 +147,8 @@ kind: ClusterRole
 metadata:
   name: ceph-csi-clientprofilereplication-editor-role
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - csi.ceph.io
@@ -195,11 +174,8 @@ kind: ClusterRole
 metadata:
   name: ceph-csi-clientprofilereplication-viewer-role
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - csi.ceph.io
@@ -221,11 +197,8 @@ kind: ClusterRole
 metadata:
   name: ceph-csi-clientprofiles-editor-role
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - csi.ceph.io
@@ -251,11 +224,8 @@ kind: ClusterRole
 metadata:
   name: ceph-csi-driver-editor-role
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - csi.ceph.io
@@ -281,11 +251,8 @@ kind: ClusterRole
 metadata:
   name: ceph-csi-driver-viewer-role
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - csi.ceph.io
@@ -307,11 +274,8 @@ kind: ClusterRole
 metadata:
   name: ceph-csi-manager-role
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - ""
@@ -429,11 +393,8 @@ kind: ClusterRole
 metadata:
   name: ceph-csi-metrics-auth-role
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - authentication.k8s.io
@@ -453,11 +414,8 @@ kind: ClusterRole
 metadata:
   name: ceph-csi-metrics-reader
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 rules:
   - nonResourceURLs:
       - /metrics
@@ -469,11 +427,8 @@ kind: ClusterRole
 metadata:
   name: ceph-csi-operatorconfig-editor-role
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - csi.ceph.io
@@ -499,11 +454,8 @@ kind: ClusterRole
 metadata:
   name: ceph-csi-operatorconfig-viewer-role
   labels:
-    helm.sh/chart: ceph-csi-operator-1.1.0
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.1.0
-    app.kubernetes.io/managed-by: Helm
 rules:
   - apiGroups:
       - csi.ceph.io
@@ -529,11 +481,7 @@ metadata:
     storage-backend: ceph
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.21.0
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/created-by: helm
-    helm.sh/chart: rook-ceph-1.21.0
 rules:
   - apiGroups:
       - ""
@@ -621,11 +569,7 @@ metadata:
     storage-backend: ceph
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.21.0
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/created-by: helm
-    helm.sh/chart: rook-ceph-1.21.0
 rules:
   - apiGroups:
       - ""
@@ -657,11 +601,7 @@ metadata:
     storage-backend: ceph
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.21.0
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/created-by: helm
-    helm.sh/chart: rook-ceph-1.21.0
 rules:
   - apiGroups:
       - ""
@@ -866,11 +806,7 @@ metadata:
     storage-backend: ceph
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.21.0
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/created-by: helm
-    helm.sh/chart: rook-ceph-1.21.0
 rules:
   - apiGroups:
       - ""
@@ -918,11 +854,7 @@ metadata:
     storage-backend: ceph
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.21.0
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/created-by: helm
-    helm.sh/chart: rook-ceph-1.21.0
 rules:
   - apiGroups:
       - ""
@@ -942,11 +874,7 @@ metadata:
     storage-backend: ceph
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.21.0
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/created-by: helm
-    helm.sh/chart: rook-ceph-1.21.0
 rules:
   - apiGroups:
       - ""
@@ -1008,11 +936,7 @@ metadata:
     storage-backend: ceph
     app.kubernetes.io/name: rook-ceph
     app.kubernetes.io/instance: rook-ceph
-    app.kubernetes.io/version: v1.21.0
     app.kubernetes.io/part-of: rook-ceph-operator
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/created-by: helm
-    helm.sh/chart: rook-ceph-1.21.0
 rules:
   - apiGroups:
       - ""
