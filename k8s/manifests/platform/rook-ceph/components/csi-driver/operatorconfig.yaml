@@ -3,6 +3,8 @@ kind: OperatorConfig
 metadata:
   name: ceph-csi-operator-config
   namespace: rook-ceph
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   driverSpecDefaults:
     log:

@@ -3,6 +3,8 @@ kind: Driver
 metadata:
   name: rook-ceph.cephfs.csi.ceph.com
   namespace: rook-ceph
+  annotations:
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   log:
     verbosity: 0
