@@ -128,6 +128,8 @@ metadata:
   labels:
     app.kubernetes.io/name: ceph-csi
     app.kubernetes.io/instance: rook-ceph
+  annotations:
+    gitops-ci.k8s.io/exempt-rbac-wildcards: "csi.ceph.io, clientprofilereplications"
 rules:
   - apiGroups:
       - csi.ceph.io
