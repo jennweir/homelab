@@ -78,16 +78,16 @@ spec:
           volumeMounts:
             - name: sable-data-volume
               mountPath: /data
-            - name: sable-toml-config
+            - name: sable-config
               mountPath: /data/sable.toml
               subPath: sable.toml
       volumes:
         - name: sable-data-volume
           persistentVolumeClaim:
             claimName: sable-data
-        - name: sable-toml-config
+        - name: sable-config
           configMap:
-            name: sable-toml
+            name: sable
             items:
               - key: sable.toml
                 path: sable.toml

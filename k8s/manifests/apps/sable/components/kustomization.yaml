@@ -3,6 +3,7 @@ kind: Kustomization
 metadata:
   namespace: sable
 resources:
+  - configmap.yaml
   - deployment.yaml
   - service.yaml
   - pvc.yaml
