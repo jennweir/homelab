@@ -1,0 +1,49 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: rook-ceph-operator-config
+  namespace: rook-ceph
+  labels:
+    operator: rook
+    storage-backend: ceph
+    app.kubernetes.io/name: rook-ceph
+    app.kubernetes.io/instance: rook-ceph
+    app.kubernetes.io/version: v1.21.0
+    app.kubernetes.io/part-of: rook-ceph-operator
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/created-by: helm
+    helm.sh/chart: rook-ceph-1.21.0
+data:
+  ROOK_LOG_LEVEL: INFO
+  ROOK_CEPH_COMMANDS_TIMEOUT_SECONDS: "15"
+  ROOK_OBC_WATCH_OPERATOR_NAMESPACE: "true"
+  ROOK_OBC_ALLOW_ADDITIONAL_CONFIG_FIELDS: maxObjects,maxSize
+  ROOK_CEPH_ALLOW_LOOP_DEVICES: "false"
+  ROOK_CEPH_MON_RUN_AS_ROOT: "false"
+  ROOK_DELETE_UNUSED_CRUSH_RULES: "true"
+  ROOK_ENABLE_DISCOVERY_DAEMON: "false"
+  ROOK_CREATE_CSI_OPERATOR_RESOURCES:
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rook-csi-operator-image-set-configmap
+  namespace: rook-ceph
+  labels:
+    operator: rook
+    storage-backend: ceph
+    app.kubernetes.io/name: rook-ceph
+    app.kubernetes.io/instance: rook-ceph
+    app.kubernetes.io/version: v1.21.0
+    app.kubernetes.io/part-of: rook-ceph-operator
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/created-by: helm
+    helm.sh/chart: rook-ceph-1.21.0
+data:
+  provisioner: ""
+  attacher: ""
+  resizer: ""
+  snapshotter: ""
+  registrar: ""
+  plugin: ""
+  addons: ""
