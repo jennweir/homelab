@@ -14,21 +14,21 @@ This file is the entry point for AI agents working in this repository.
 
 ## Repository Map
 
-| Path | Purpose |
-|---|---|
-| `k8s/` | **Active** cluster config — manifests, installation, and maintenance for the CoreOS Kubernetes nodes |
-| `k8s/manifests/` | All Kustomize overlays: `platform/` (cert-manager, cilium, argocd, rook-ceph, etc.) and `apps/` |
-| `k8s/installation/` | FCOS ISO creation, ignition generation, and ansible playbooks for bootstrap |
-| `k8s/maintenance/` | Upgrade playbooks and node inventory |
-| `okd/` | **Legacy** — OKD installer configs, VM XML, deployment scripts, and OKD-specific manifests from a previous cluster. Historical reference only. |
-| `okd/manifests/platform/cluster-auth/` | Legacy OKD cluster auth config — do **not** use for active troubleshooting |
-| `terraform/k8s-lab/` | **Active** Terraform — GCP WIF, Cloud DNS, and Azure AD app registrations |
-| `terraform/pi-cluster/` | **Legacy** — pi-cluster GCP infra, no longer relevant |
-| `container-images/` | Custom Containerfiles (`apache`, `coreos-kubernetes`, `argocd-sidecar-avp`) |
-| `scripts/` | Helper scripts (iSCSI, manifest generation, namespace cleanup, WIF config) |
-| `tests/` | Kustomize test overlays (WIF test, base) |
-| `docs/` | Operational docs (Proxmox, libvirt, firewalld, SELinux, storage, etc.) |
-| `staging/` | Staging / draft configs — **not** authoritative |
+| Path                                   | Purpose                                                                                                                                        |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `k8s/`                                 | **Active** cluster config — manifests, installation, and maintenance for the CoreOS Kubernetes nodes                                           |
+| `k8s/manifests/`                       | All Kustomize overlays: `platform/` (cert-manager, cilium, argocd, rook-ceph, etc.) and `apps/`                                                |
+| `k8s/installation/`                    | FCOS ISO creation, ignition generation, and ansible playbooks for bootstrap                                                                    |
+| `k8s/maintenance/`                     | Upgrade playbooks and node inventory                                                                                                           |
+| `okd/`                                 | **Legacy** — OKD installer configs, VM XML, deployment scripts, and OKD-specific manifests from a previous cluster. Historical reference only. |
+| `okd/manifests/platform/cluster-auth/` | Legacy OKD cluster auth config — do **not** use for active troubleshooting                                                                     |
+| `terraform/k8s-lab/`                   | **Active** Terraform — GCP WIF, Cloud DNS, and Azure AD app registrations                                                                      |
+| `terraform/pi-cluster/`                | **Legacy** — pi-cluster GCP infra, no longer relevant                                                                                          |
+| `container-images/`                    | Custom Containerfiles (`apache`, `coreos-kubernetes`, `argocd-sidecar-avp`)                                                                    |
+| `scripts/`                             | Helper scripts (iSCSI, manifest generation, namespace cleanup, WIF config)                                                                     |
+| `tests/`                               | Kustomize test overlays (WIF test, base)                                                                                                       |
+| `docs/`                                | Operational docs (Proxmox, libvirt, firewalld, SELinux, storage, etc.)                                                                         |
+| `staging/`                             | Staging / draft configs — **not** authoritative                                                                                                |
 
 ## Cluster Overview
 

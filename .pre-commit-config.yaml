@@ -33,3 +33,9 @@ repos:
       - id: check-merge-conflict
       - id: detect-private-key
         exclude: ^k8s/manifests/platform/external-secrets-operator/components/v2\.12\.0/customresourcedefinition\.yaml$
+
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: v3.9.6
+    hooks:
+      - id: prettier
+        types_or: [markdown, yaml]

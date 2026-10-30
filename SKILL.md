@@ -11,10 +11,10 @@ acting on cluster, manifest, or Ansible changes. The companion file
 
 ## Cluster Inventory
 
-| Cluster    | Distribution                  | Nodes                                         | Storage   | KUBECONFIG        |
-| ---------- | ----------------------------- | --------------------------------------------- | --------- | ----------------- |
-| k8s-lab    | Kubernetes on CoreOS          | 3 control-plane (`cp-1/2/3`)                  | Rook-Ceph | `.kube/lab`       |
-| pi-cluster | _(offline, pending redeploy)_ | 3 Raspberry Pis (historical overlays only)    | _(n/a)_   | _(n/a)_           |
+| Cluster    | Distribution                  | Nodes                                      | Storage   | KUBECONFIG  |
+| ---------- | ----------------------------- | ------------------------------------------ | --------- | ----------- |
+| k8s-lab    | Kubernetes on CoreOS          | 3 control-plane (`cp-1/2/3`)               | Rook-Ceph | `.kube/lab` |
+| pi-cluster | _(offline, pending redeploy)_ | 3 Raspberry Pis (historical overlays only) | _(n/a)_   | _(n/a)_     |
 
 GitOps: ArgoCD reconciles `k8s/manifests/` into the active cluster. All
 Kustomize overlays under `k8s/manifests/` use the `lab` target for the k8s
@@ -42,16 +42,16 @@ The kubeconfig grants **cluster-admin**. Caution rules:
 
 ## Cluster Services
 
-| Concern              | Implementation                                              |
-| -------------------- | ---------------------------------------------------------- |
-| HA load balancer     | kube-vip                                                   |
-| CNI / Gateway API    | Cilium                                                     |
-| GitOps               | ArgoCD                                                     |
-| Operator management  | OLM v0 (active); OLM v1 kept for future migration/testing  |
-| Storage              | Rook-Ceph                                                  |
-| Certificates / DNS   | cert-manager + Google Cloud DNS via GCP WIF                |
-| Secrets              | External Secrets Operator + Google Secrets Manager (GSM)   |
-| Authentication       | Azure AD OIDC (`k8s/manifests/platform/authentication/`)   |
+| Concern             | Implementation                                            |
+| ------------------- | --------------------------------------------------------- |
+| HA load balancer    | kube-vip                                                  |
+| CNI / Gateway API   | Cilium                                                    |
+| GitOps              | ArgoCD                                                    |
+| Operator management | OLM v0 (active); OLM v1 kept for future migration/testing |
+| Storage             | Rook-Ceph                                                 |
+| Certificates / DNS  | cert-manager + Google Cloud DNS via GCP WIF               |
+| Secrets             | External Secrets Operator + Google Secrets Manager (GSM)  |
+| Authentication      | Azure AD OIDC (`k8s/manifests/platform/authentication/`)  |
 
 ## Repository Workflow
 
@@ -64,7 +64,7 @@ The kubeconfig grants **cluster-admin**. Caution rules:
 3. Run `k8s-gitops-ci kustomize-fix -dir k8s/manifests/<app>` to normalize
    field ordering and prepend the `---` document marker.
 4. Validate with `k8s-gitops-ci test --app k8s/manifests/<app> --cluster lab
-   --disable-checks avp`.
+--disable-checks avp`.
 5. Follow manifest authoring rules: 2-space YAML indent, `---` document marker
    at top, `base/` holds the canonical resource, `overlays/<target>/` holds
    patches and additions.
@@ -119,7 +119,7 @@ The kubeconfig grants **cluster-admin**. Caution rules:
   exported — otherwise AVP placeholder resolution fails the overlay build with
   unrelated noise.
 - **Scoped validation**: `k8s-gitops-ci test --app k8s/manifests/<app> --cluster
-  lab --disable-checks avp` (repeatable; `--app` alone validates every overlay
+lab --disable-checks avp` (repeatable; `--app` alone validates every overlay
   of that app, `--cluster` alone validates every app targeting that cluster).
 - Avoid full-repo scans that include `pi-cluster` overlays — they are not part
   of CI and produce irrelevant noise.
