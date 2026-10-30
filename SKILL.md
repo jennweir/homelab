@@ -81,12 +81,14 @@ The kubeconfig grants **cluster-admin**. Caution rules:
   available).
 - Never commit plaintext secrets, kubeconfigs, tokens, or `.env` files.
 
-### Terraform
+### OpenTofu
 
-- Active TF: `terraform/k8s-lab/` — manages GCP WIF, Cloud DNS, and Azure AD
-  app registrations.
-- Legacy TF: `terraform/pi-cluster/` — historical, do **not** modify.
-- State is stored in GCS backends (`backend.hcl`).
+- Active OpenTofu: `opentofu/k8s-lab/` — manages GCP WIF, Cloud DNS, and Azure
+  AD app registrations.
+- Legacy OpenTofu: `opentofu/pi-cluster/` — historical, do **not** modify.
+- State is stored in GCS backends. Authenticate with Application Default
+  Credentials (`gcloud auth application-default login`); do not put credentials
+  or tokens in the backend block.
 
 ### Ansible
 
@@ -161,7 +163,7 @@ YAML rules: 2-space indent, `---` document marker at top. Shell scripts:
 - `okd/` — legacy OKD installer configs, VM XML definitions, and OKD-specific
   manifests from a previous cluster. Read for historical context only; do not
   use as reference for active cluster decisions.
-- `terraform/pi-cluster/` — historical GCP infra for the pi-cluster. Do not
+- `opentofu/pi-cluster/` — historical GCP infra for the pi-cluster. Do not
   modify.
 - `pi-cluster` / `okd` / `pi` overlays under `k8s/manifests/` — historical, not
   deployed to the active cluster.
