@@ -14,13 +14,13 @@ B --- D
 B --- E
 B --- F
 subgraph 192.168.X.X
-subgraph OKD Cluster
+subgraph CoreOS Kubernetes Cluster
 C["cp-1 192.168.0.11"]
 D["cp-2 192.168.0.12"]
 E["cp-3 192.168.0.13"]
 end
 F[TP Link Switch]
-subgraph Kubernetes Cluster
+subgraph pi-cluster (offline, pending redeploy)
 G["pi-1 192.168.0.101"]
 H["pi-2 192.168.0.102"]
 I["pi-3 192.168.0.103"]
