@@ -187,13 +187,18 @@ resource "google_service_account_iam_member" "cert_manager_wif_binding" {
 
 # Azure ------------------------------------------------------------------------------------------------------------------
 
-resource "azuread_application" "okd_cluster" {
-    display_name = "okd-cluster"
+resource "azuread_application" "k8s_lab_cluster" {
+    display_name = "k8s-lab"
     web {
         redirect_uris = [
-            "https://oauth-openshift.apps.okd.jenniferpweir.com/oauth2callback/Azure_AD",
-            "https://console-openshift-console.apps.okd.jenniferpweir.com/auth/callback",
-            "https://argocd-server-argocd.apps.okd.jenniferpweir.com/auth/callback"
+            "https://argocd.homelab.jenniferpweir.com/auth/callback"
+        ]
+    }
+    # Desktop/CLI clients for kubectl access
+    public_client {
+        redirect_uris = [
+        "http://localhost:8000",
+        "http://localhost:18000"
         ]
     }
 }
