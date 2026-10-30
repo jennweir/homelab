@@ -7,8 +7,8 @@ This file is the entry point for AI agents working in this repository.
 - This repo manages a **bare-metal Kubernetes cluster** running on **CoreOS** (3 control-plane nodes) and a **pi-cluster** (Raspberry Pis, not currently operational, pending redeployment).
 - Applications are deployed via **ArgoCD GitOps**.
 - Kubernetes manifests live in `k8s/manifests/` — this is the source of truth for active clusters.
-- Terraform in `terraform/k8s-lab/` provisions Google Cloud WIF, Cloud DNS, and the Azure AD app for the active cluster.
-- **`okd/` is a historical artifact** from a previous OKD cluster. Do **not** rely on it when troubleshooting or making decisions about the active Kubernetes cluster. Same applies to `terraform/pi-cluster/` and the `pi-cluster` overlays — historical, non-operational.
+- OpenTofu in `opentofu/k8s-lab/` provisions Google Cloud WIF, Cloud DNS, and the Azure AD app for the active cluster.
+- **`okd/` is a historical artifact** from a previous OKD cluster. Do **not** rely on it when troubleshooting or making decisions about the active Kubernetes cluster. Same applies to `opentofu/pi-cluster/` and the `pi-cluster` overlays — historical, non-operational.
 - Agents must **never commit files** on the user's behalf. Always present diffs and let the user commit themselves.
 - **Plan mode = read-only.** Never write to files in plan mode. Only write files in build mode.
 
@@ -22,8 +22,8 @@ This file is the entry point for AI agents working in this repository.
 | `k8s/maintenance/`                     | Upgrade playbooks and node inventory                                                                                                           |
 | `okd/`                                 | **Legacy** — OKD installer configs, VM XML, deployment scripts, and OKD-specific manifests from a previous cluster. Historical reference only. |
 | `okd/manifests/platform/cluster-auth/` | Legacy OKD cluster auth config — do **not** use for active troubleshooting                                                                     |
-| `terraform/k8s-lab/`                   | **Active** Terraform — GCP WIF, Cloud DNS, and Azure AD app registrations                                                                      |
-| `terraform/pi-cluster/`                | **Legacy** — pi-cluster GCP infra, no longer relevant                                                                                          |
+| `opentofu/k8s-lab/`                    | **Active** OpenTofu — GCP WIF, Cloud DNS, and Azure AD app registrations                                                                       |
+| `opentofu/pi-cluster/`                 | **Legacy** — pi-cluster GCP infra, no longer relevant                                                                                          |
 | `container-images/`                    | Custom Containerfiles (`apache`, `coreos-kubernetes`, `argocd-sidecar-avp`)                                                                    |
 | `scripts/`                             | Helper scripts (iSCSI, manifest generation, namespace cleanup, WIF config)                                                                     |
 | `tests/`                               | Kustomize test overlays (WIF test, base)                                                                                                       |
@@ -62,11 +62,11 @@ The **pi-cluster** (pi-1/2/3 at 192.168.0.101–103) is **not currently operatio
 - `---` document marker required at top of files.
 - Follow the Kustomize conventions: `base/` has the canonical resource, `overlays/<target>/` has patches and additions.
 
-### Terraform
+### OpenTofu
 
-- Active TF: `terraform/k8s-lab/` — manages GCP WIF, Cloud DNS, and Azure AD app for the Kubernetes cluster.
-- Legacy TF: `terraform/pi-cluster/` — historical, do **not** modify.
-- State is stored in GCS backends (`backend.hcl`).
+- Active OpenTofu: `opentofu/k8s-lab/` — manages GCP WIF, Cloud DNS, and Azure AD app for the Kubernetes cluster.
+- Legacy OpenTofu: `opentofu/pi-cluster/` — historical, do **not** modify.
+- State is stored in GCS backends. Authenticate with Application Default Credentials (`gcloud auth application-default login`); do not put credentials or tokens in the backend block.
 
 ### Ansible
 
@@ -108,7 +108,7 @@ The **pi-cluster** (pi-1/2/3 at 192.168.0.101–103) is **not currently operatio
 ## Out of Scope
 
 - `okd/` — legacy OKD installer configs, VM XML definitions, and OKD-specific manifests from a previous cluster. Read for historical context only; do **not** use as reference for active cluster decisions.
-- `terraform/pi-cluster/` — historical GCP infra for the pi-cluster. Do **not** modify.
+- `opentofu/pi-cluster/` — historical GCP infra for the pi-cluster. Do **not** modify.
 - `pi-cluster` / `okd` / `pi` overlays under `k8s/manifests/` — historical, not deployed to the active cluster.
 - `staging/` — draft configs, not authoritative.
 - `docs/` — operational reference, not deployed manifests.
