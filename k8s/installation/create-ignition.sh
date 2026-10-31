@@ -9,7 +9,6 @@ trap '[[ -n "$tmp" ]] && rm -f "$tmp"' EXIT
 
 case "${1:-}" in
   lab) dir=coreos-lab ;;
-  pis) dir=coreos-pis ;;
   "")
     echo "usage: $0 {lab|pis}" >&2
     exit 1

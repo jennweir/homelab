@@ -20,7 +20,7 @@ D["cp-2 192.168.0.12"]
 E["cp-3 192.168.0.13"]
 end
 F[TP Link Switch]
-subgraph "pi-cluster (offline, pending redeploy)"
+subgraph "pi-lab"
 G["pi-1 192.168.0.101"]
 H["pi-2 192.168.0.102"]
 I["pi-3 192.168.0.103"]

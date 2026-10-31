@@ -25,5 +25,4 @@ tofu apply
 State is stored in the `jennweir-terraform-backend` GCS bucket:
 `gs://jennweir-terraform-backend/terraform/state/k8s-lab/`.
 
-`opentofu/pi-cluster/` is legacy (the pi-cluster is offline pending
-redeployment) and is kept for historical reference.
+For the pi-lab cluster, see `opentofu/pi-cluster/` for GCP/WIF and Azure AD app registration infrastructure.
