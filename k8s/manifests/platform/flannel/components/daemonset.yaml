@@ -14,8 +14,6 @@ spec:
       k8s-app: flannel
   template:
     metadata:
-      annotations:
-        gitops-ci.k8s.io/exempt-podspec-defaults: "true"
       labels:
         app: flannel
         k8s-app: flannel
