@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
-# Platform-level exemptions for infra resources that legitimately
-# deviate from pod security best practices (hostNetwork, privileged
-# containers, etc.) required for their function.
-EXEMPTIONS=(
-  check=podspec-defaults,kind=Pod,name=kube-vip
-  check=podspec-defaults,kind=DaemonSet,name=kube-flannel-ds
+# platform-level exemptions for infra resources that are shipped
+# deviating from pod security best practices
+export EXEMPTIONS=(
+  "check=podspec-defaults,kind=Pod,name=kube-vip"
+  "check=podspec-defaults,kind=DaemonSet,name=kube-flannel-ds"
 )
