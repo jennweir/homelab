@@ -11,15 +11,14 @@ acting on cluster, manifest, or Ansible changes. The companion file
 
 ## Cluster Inventory
 
-| Cluster    | Distribution                  | Nodes                                      | Storage   | KUBECONFIG  |
-| ---------- | ----------------------------- | ------------------------------------------ | --------- | ----------- |
-| k8s-lab    | Kubernetes on CoreOS          | 3 control-plane (`cp-1/2/3`)               | Rook-Ceph | `.kube/lab` |
-| pi-cluster | _(offline, pending redeploy)_ | 3 Raspberry Pis (historical overlays only) | _(n/a)_   | _(n/a)_     |
+| Cluster | Distribution         | Nodes                        | Storage   | KUBECONFIG  |
+| ------- | -------------------- | ---------------------------- | --------- | ----------- |
+| k8s-lab | Kubernetes on CoreOS | 3 control-plane (`cp-1/2/3`) | Rook-Ceph | `.kube/lab` |
+| pi-lab  | operational          | 3 Raspberry Pis              | _(n/a)_   | _(n/a)_     |
 
 GitOps: ArgoCD reconciles `k8s/manifests/` into the active cluster. All
 Kustomize overlays under `k8s/manifests/` use the `lab` target for the k8s
-cluster. Legacy overlays (`pi-cluster`, `okd`, `pi`) are historical and are
-not deployed.
+cluster. Overlay (`pi-lab`) is active for the pi-lab cluster.
 
 ## Cluster Authentication
 
@@ -85,7 +84,7 @@ The kubeconfig grants **cluster-admin**. Caution rules:
 
 - Active OpenTofu: `opentofu/k8s-lab/` — manages GCP WIF, Cloud DNS, and Azure
   AD app registrations.
-- Legacy OpenTofu: `opentofu/pi-cluster/` — historical, do **not** modify.
+- Active OpenTofu: `opentofu/pi-cluster/` — manages GCP WIF, Cloud DNS, and Azure AD app for the pi-lab cluster.
 - State is stored in GCS backends. Authenticate with Application Default
   Credentials (`gcloud auth application-default login`); do not put credentials
   or tokens in the backend block.
@@ -123,8 +122,6 @@ The kubeconfig grants **cluster-admin**. Caution rules:
 - **Scoped validation**: `k8s-gitops-ci test --app k8s/manifests/<app> --cluster
 lab --disable-checks avp` (repeatable; `--app` alone validates every overlay
   of that app, `--cluster` alone validates every app targeting that cluster).
-- Avoid full-repo scans that include `pi-cluster` overlays — they are not part
-  of CI and produce irrelevant noise.
 - Individual linters: `k8s-gitops-ci yamllint`, `k8s-gitops-ci shellcheck`,
   `k8s-gitops-ci markdownlint`, etc.
 
@@ -163,10 +160,6 @@ YAML rules: 2-space indent, `---` document marker at top. Shell scripts:
 - `okd/` — legacy OKD installer configs, VM XML definitions, and OKD-specific
   manifests from a previous cluster. Read for historical context only; do not
   use as reference for active cluster decisions.
-- `opentofu/pi-cluster/` — historical GCP infra for the pi-cluster. Do not
-  modify.
-- `pi-cluster` / `okd` / `pi` overlays under `k8s/manifests/` — historical, not
-  deployed to the active cluster.
 - `staging/` — draft configs, not authoritative.
 - `docs/` — operational reference, not deployed manifests.
 - `.git/`, `CHANGELOG.md` (auto-maintained) — do not edit unless explicitly

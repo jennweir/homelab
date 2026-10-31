@@ -4,11 +4,11 @@ This file is the entry point for AI agents working in this repository.
 
 ## Project Overview
 
-- This repo manages a **bare-metal Kubernetes cluster** running on **CoreOS** (3 control-plane nodes) and a **pi-cluster** (Raspberry Pis, not currently operational, pending redeployment).
+- This repo manages a **bare-metal Kubernetes cluster** running on **CoreOS** (3 control-plane nodes) and a **pi-lab** (Raspberry Pis cluster).
 - Applications are deployed via **ArgoCD GitOps**.
 - Kubernetes manifests live in `k8s/manifests/` — this is the source of truth for active clusters.
 - OpenTofu in `opentofu/k8s-lab/` provisions Google Cloud WIF, Cloud DNS, and the Azure AD app for the active cluster.
-- **`okd/` is a historical artifact** from a previous OKD cluster. Do **not** rely on it when troubleshooting or making decisions about the active Kubernetes cluster. Same applies to `opentofu/pi-cluster/` and the `pi-cluster` overlays — historical, non-operational.
+- **`okd/` is a historical artifact** from a previous OKD cluster. Do **not** rely on it when troubleshooting or making decisions about the active Kubernetes cluster.
 - Agents must **never commit files** on the user's behalf. Always present diffs and let the user commit themselves.
 - **Plan mode = read-only.** Never write to files in plan mode. Only write files in build mode.
 
@@ -23,7 +23,7 @@ This file is the entry point for AI agents working in this repository.
 | `okd/`                                 | **Legacy** — OKD installer configs, VM XML, deployment scripts, and OKD-specific manifests from a previous cluster. Historical reference only. |
 | `okd/manifests/platform/cluster-auth/` | Legacy OKD cluster auth config — do **not** use for active troubleshooting                                                                     |
 | `opentofu/k8s-lab/`                    | **Active** OpenTofu — GCP WIF, Cloud DNS, and Azure AD app registrations                                                                       |
-| `opentofu/pi-cluster/`                 | **Legacy** — pi-cluster GCP infra, no longer relevant                                                                                          |
+| `opentofu/pi-cluster/`                 | **Active** — pi-lab GCP/WIF infra for the pi-lab cluster                                                                                       |
 | `container-images/`                    | Custom Containerfiles (`apache`, `coreos-kubernetes`, `argocd-sidecar-avp`)                                                                    |
 | `scripts/`                             | Helper scripts (iSCSI, manifest generation, namespace cleanup, WIF config)                                                                     |
 | `tests/`                               | Kustomize test overlays (WIF test, base)                                                                                                       |
@@ -44,14 +44,14 @@ The active cluster is vanilla **Kubernetes on CoreOS bare-metal nodes**:
 - **Secrets**: External Secrets Operator (ESO) with Google Secrets Manager (GSM)
 - **Authentication**: Azure AD OIDC via `k8s/manifests/platform/authentication/`
 
-The **pi-cluster** (pi-1/2/3 at 192.168.0.101–103) is **not currently operational** and is slated for redeployment. Treat its overlays as historical until that happens.
+The **pi-lab** (pi-1/2/3 at 192.168.0.101–103) is operational. Treat its overlays as active.
 
 ## Conventions
 
 ### Kubernetes manifests (Kustomize)
 
 - Layout per component: `k8s/manifests/<scope>/<name>/{base,overlays/<target>}` with a `kustomization.yaml` at each level.
-- Active overlay target: `lab` (the active cluster). Legacy overlays include `pi-cluster`, `okd`, and `pi` — historical, do not use for active troubleshooting.
+- Active overlay target: `lab` (the active cluster). Pi-lab overlay: `pi-lab` (active cluster).
 - After editing any `kustomization.yaml`, run `k8s-gitops-ci kustomize-fix -dir k8s/manifests/<component>` to normalize field ordering.
 - **Secrets**: prefer **External Secrets Operator** (`ExternalSecret` resources). Never commit plaintext secrets. AVP placeholders (`<path:...#key>`) are used only when ESO cannot express the requirement.
 - The `k8s-gitops-ci` tool is used for local validation — see [CI Validation](#ci-validation) below.
@@ -65,7 +65,7 @@ The **pi-cluster** (pi-1/2/3 at 192.168.0.101–103) is **not currently operatio
 ### OpenTofu
 
 - Active OpenTofu: `opentofu/k8s-lab/` — manages GCP WIF, Cloud DNS, and Azure AD app for the Kubernetes cluster.
-- Legacy OpenTofu: `opentofu/pi-cluster/` — historical, do **not** modify.
+- Active OpenTofu: `opentofu/pi-cluster/` — manages GCP WIF, Cloud DNS, and Azure AD app for the pi-lab cluster.
 - State is stored in GCS backends. Authenticate with Application Default Credentials (`gcloud auth application-default login`); do not put credentials or tokens in the backend block.
 
 ### Ansible
@@ -89,7 +89,7 @@ The **pi-cluster** (pi-1/2/3 at 192.168.0.101–103) is **not currently operatio
 ## CI Validation
 
 - **Local iteration**: `k8s-gitops-ci test --app k8s/manifests/<component> --cluster lab --disable-checks avp`
-- **Full repo scan**: `k8s-gitops-ci test --all --disable-checks avp` (avoid `pi-cluster` overlays — they are not part of CI).
+- **Full repo scan**: `k8s-gitops-ci test --all --disable-checks avp`.
 - Always pass `--disable-checks avp` unless `VAULT_ADDR` and `VAULT_TOKEN` are exported.
 - Individual linters: `k8s-gitops-ci yamllint`, `k8s-gitops-ci shellcheck`, `k8s-gitops-ci markdownlint`, etc.
 
@@ -108,8 +108,6 @@ The **pi-cluster** (pi-1/2/3 at 192.168.0.101–103) is **not currently operatio
 ## Out of Scope
 
 - `okd/` — legacy OKD installer configs, VM XML definitions, and OKD-specific manifests from a previous cluster. Read for historical context only; do **not** use as reference for active cluster decisions.
-- `opentofu/pi-cluster/` — historical GCP infra for the pi-cluster. Do **not** modify.
-- `pi-cluster` / `okd` / `pi` overlays under `k8s/manifests/` — historical, not deployed to the active cluster.
 - `staging/` — draft configs, not authoritative.
 - `docs/` — operational reference, not deployed manifests.
 - `.git/`, `CHANGELOG.md` (auto-maintained) — do not edit unless explicitly requested.
