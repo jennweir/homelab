@@ -19,12 +19,12 @@ jobs:
     container:
       image: ghcr.io/arthurvardevanyan/k8s-gitops-ci:0.63.0@sha256:ace79fe17227d0cd9cc65d0cc59251af719d6911747f40f5b79b0ac8bdb45336
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
       - name: Generate CI bot token
         id: app-token
-        uses: actions/create-github-app-token@v3
+        uses: actions/create-github-app-token@v3.3.0
         with:
           client-id: ${{ secrets.CI_BOT_CLIENT_ID }}
           private-key: ${{ secrets.CI_BOT_PRIVATE_KEY }}
