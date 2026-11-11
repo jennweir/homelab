@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: openshell-peer
+  labels:
+    app.kubernetes.io/name: openshell
+    app.kubernetes.io/instance: openshell
+spec:
+  clusterIP: None
+  publishNotReadyAddresses: true
+  ports:
+    - port: 8080
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+      appProtocol: grpc
+  selector:
+    app.kubernetes.io/name: openshell
+    app.kubernetes.io/instance: openshell
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openshell
+  labels:
+    app.kubernetes.io/name: openshell
+    app.kubernetes.io/instance: openshell
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: grpc
+      protocol: TCP
+      name: grpc
+      appProtocol: grpc
+    - port: 9090
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    app.kubernetes.io/name: openshell
+    app.kubernetes.io/instance: openshell

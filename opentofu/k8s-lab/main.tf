@@ -145,6 +145,37 @@ resource "google_service_account_iam_member" "cert_manager_wif_binding" {
     member             = "principal://iam.googleapis.com/projects/${data.google_project.k8s_lab.number}/locations/global/workloadIdentityPools/${google_iam_workload_identity_pool.k8s_pool.workload_identity_pool_id}/subject/system:serviceaccount:cert-manager:cert-manager"
 }
 
+resource "google_service_account" "openshell_eso_sa" {
+    account_id   = "openshell-eso-sa"
+    display_name = "Openshell ESO Service Account for GSM access"
+    project      = data.google_project.k8s_lab.project_id
+}
+
+resource "google_service_account_iam_member" "openshell_wif_binding" {
+    service_account_id = "projects/${data.google_project.k8s_lab.project_id}/serviceAccounts/${google_service_account.openshell_eso_sa.email}"
+    role               = "roles/iam.workloadIdentityUser"
+    member             = "principal://iam.googleapis.com/projects/${data.google_project.k8s_lab.number}/locations/global/workloadIdentityPools/${google_iam_workload_identity_pool.k8s_pool.workload_identity_pool_id}/subject/system:serviceaccount:openshell:openshell-eso-sa"
+}
+
+resource "google_secret_manager_secret" "openshell_key_encryption_key" {
+    project   = data.google_project.k8s_lab.project_id
+    secret_id = "openshell-key"
+    replication {
+        user_managed {
+            replicas {
+                location = "us-central1"
+            }
+        }
+    }
+}
+
+resource "google_secret_manager_secret_iam_member" "openshell_secret_accessor" {
+    project   = data.google_project.k8s_lab.project_id
+    secret_id = google_secret_manager_secret.openshell_key_encryption_key.secret_id
+    role      = "roles/secretmanager.secretAccessor"
+    member    = "serviceAccount:${google_service_account.openshell_eso_sa.email}"
+}
+
 # make k8s service account secretAccessor directly instead of via impersonation of google service account bc of eso limitations
 # resource "google_secret_manager_secret_iam_member" "openshift_monitoring_secret_accessor" {
 #     project   = data.google_project.k8s_lab.project_id
@@ -187,13 +218,18 @@ resource "google_service_account_iam_member" "cert_manager_wif_binding" {
 
 # Azure ------------------------------------------------------------------------------------------------------------------
 
-resource "azuread_application" "okd_cluster" {
-    display_name = "okd-cluster"
+resource "azuread_application" "k8s_lab_cluster" {
+    display_name = "k8s-lab"
     web {
         redirect_uris = [
-            "https://oauth-openshift.apps.okd.jenniferpweir.com/oauth2callback/Azure_AD",
-            "https://console-openshift-console.apps.okd.jenniferpweir.com/auth/callback",
-            "https://argocd-server-argocd.apps.okd.jenniferpweir.com/auth/callback"
+            "https://argocd.homelab.jenniferpweir.com/auth/callback"
+        ]
+    }
+    # Desktop/CLI clients for kubectl access
+    public_client {
+        redirect_uris = [
+        "http://localhost:8000",
+        "http://localhost:18000"
         ]
     }
 }
