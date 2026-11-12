@@ -28,8 +28,12 @@ resource "google_iam_workload_identity_pool_provider" "gh_provider" {
     workload_identity_pool_id          = google_iam_workload_identity_pool.gh_pool.workload_identity_pool_id
     workload_identity_pool_provider_id = local.gh_provider
     attribute_mapping = {
-        "google.subject" = "assertion.sub"
+        "google.subject"             = "assertion.sub"
+        "attribute.repository"       = "assertion.repository"
+        "attribute.repository_owner" = "assertion.repository_owner"
     }
+
+    attribute_condition = "assertion.repository_owner == 'jennweir'"
     oidc {
         issuer_uri        = "https://token.actions.githubusercontent.com"
         allowed_audiences = ["github.com"]
@@ -53,7 +57,6 @@ resource "google_project_iam_member" "gh_plan_iam" {
     for_each = toset([
         "roles/viewer",
         "roles/storage.objectViewer",
-        "roles/resourcemanager.projectViewer",
     ])
     project = data.google_project.pi_cluster.project_id
     role    = each.value
@@ -64,7 +67,6 @@ resource "google_project_iam_member" "gh_apply_iam" {
     for_each = toset([
         "roles/viewer",
         "roles/storage.objectViewer",
-        "roles/resourcemanager.projectViewer",
         "roles/storage.objectAdmin",
         "roles/resourcemanager.projectIamAdmin",
     ])
@@ -74,15 +76,15 @@ resource "google_project_iam_member" "gh_apply_iam" {
 }
 
 resource "google_service_account_iam_member" "gh_plan_wif_binding" {
-    service_account_id = "projects/${data.google_project.pi_cluster.project_id}/serviceAccounts/${google_service_account.gh_plan.email}"
+    service_account_id = google_service_account.gh_plan.name
     role               = "roles/iam.workloadIdentityUser"
-    member             = "principal://iam.googleapis.com/projects/${data.google_project.pi_cluster.number}/locations/global/workloadIdentityPools/${local.gh_pool}/subjects/github-pipeline"
+    member             = "principalSet://iam.googleapis.com/projects/${data.google_project.pi_cluster.number}/locations/global/workloadIdentityPools/${local.gh_pool}/attribute.repository/jennweir/homelab"
 }
 
 resource "google_service_account_iam_member" "gh_apply_wif_binding" {
-    service_account_id = "projects/${data.google_project.pi_cluster.project_id}/serviceAccounts/${google_service_account.gh_apply.email}"
+    service_account_id = google_service_account.gh_apply.name
     role               = "roles/iam.workloadIdentityUser"
-    member             = "principal://iam.googleapis.com/projects/${data.google_project.pi_cluster.number}/locations/global/workloadIdentityPools/${local.gh_pool}/subjects/github-pipeline"
+    member             = "principal://iam.googleapis.com/projects/${data.google_project.pi_cluster.number}/locations/global/workloadIdentityPools/${local.gh_pool}/subject/repo:jennweir/homelab:ref:refs/heads/main"
 }
 
 resource "google_service_account" "gsm_accessor" {
