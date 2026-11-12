@@ -45,6 +45,7 @@ jobs:
           service_account: ${{ vars.GSA_EMAIL }}
           create_credentials_file: "true"
           token_format: "access_token"
+          audience: "github.com"
 
       - name: OpenTofu Init
         working-directory: ${{ env.TOFU_DIR }}

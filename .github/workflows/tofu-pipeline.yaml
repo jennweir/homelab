@@ -46,6 +46,7 @@ jobs:
           service_account: ${{ matrix.service_account }}
           create_credentials_file: "true"
           token_format: "access_token"
+          audience: "github.com"
 
       - name: OpenTofu Init
         id: init
@@ -184,6 +185,7 @@ jobs:
           service_account: ${{ matrix.service_account }}
           create_credentials_file: "true"
           token_format: "access_token"
+          audience: "github.com"
 
       - name: Download Plan
         uses: actions/download-artifact@v4
