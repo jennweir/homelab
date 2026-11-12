@@ -1,0 +1,191 @@
+name: OpenTofu CI/CD
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "opentofu/**"
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+env:
+  TOFU_DIR: "opentofu/k8s-lab"
+
+jobs:
+  plan:
+    name: Plan - ${{ matrix.dir }}
+    strategy:
+      matrix:
+        dir: [k8s-lab, pi-cluster]
+      fail-fast: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v2.0.2
+        with:
+          tofu_version: "1.10.0"
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v3.0.1
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.GSA_EMAIL }}
+          create_credentials_file: "true"
+          token_format: "access_token"
+
+      - name: OpenTofu Init
+        id: init
+        working-directory: ${{ format('opentofu/{0}', matrix.dir) }}
+        run: tofu init
+
+      - name: OpenTofu Plan
+        id: plan
+        working-directory: ${{ format('opentofu/{0}', matrix.dir) }}
+        run: tofu plan -no-color -detailed-exitcode -out=tfplan || echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Format Plan Output
+        id: format
+        working-directory: ${{ format('opentofu/{0}', matrix.dir) }}
+        run: |
+          tofu plan -no-color -detailed-exitcode 2>&1 > plan_output.txt || true
+          if [ -s plan_output.txt ]; then
+            if [ $(wc -c < plan_output.txt) -gt 65000 ]; then
+              head -c 65000 plan_output.txt > plan_output.txt
+              echo "..." >> plan_output.txt
+            fi
+          fi
+
+      - name: Upload Plan Artifact
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: tfplan-${{ matrix.dir }}
+          path: ${{ format('opentofu/{0}/', matrix.dir) }}tfplan
+          retention-days: 5
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+
+            let planOutput = 'No changes detected.';
+            try {
+              planOutput = fs.readFileSync('${{ format('opentofu/{0}/', matrix.dir) }}plan_output.txt', 'utf8') || 'Plan output not available.';
+            } catch (e) {
+              planOutput = 'Plan output not available.';
+            }
+
+            const hasChanges = planOutput.includes('+ resource') || planOutput.includes('+ ') || planOutput.includes('Plan:');
+
+            if (!hasChanges) {
+              return;
+            }
+
+            const body = [
+              '## OpenTofu Plan',
+              '',
+              `<details>`,
+              `<summary>Plan for ${{ matrix.dir }}</summary>`,
+              '',
+              '```',
+              planOutput,
+              '```',
+              '',
+              '</details>',
+              '',
+              `> Triggered by **${{ github.actor }}**`,
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100
+            });
+
+            const botComment = comments.find(c =>
+              c.user.login === 'github-actions[bot]' &&
+              c.body && c.body.includes('## OpenTofu Plan') &&
+              c.body.includes('${{ matrix.dir }}')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+
+      - name: Exit with error if plan detected changes
+        if: steps.plan.outputs.exit_code != '0'
+        run: |
+          echo "::error::OpenTofu plan detected changes for ${{ matrix.dir }}. Review the PR comment."
+          exit 1
+
+  apply:
+    name: Apply - ${{ matrix.dir }}
+    needs: plan
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    strategy:
+      matrix:
+        dir: [k8s-lab, pi-cluster]
+      fail-fast: false
+    environment: production
+    timeout-minutes: 30
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v2.0.2
+        with:
+          tofu_version: "1.10.0"
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v3.0.1
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.GSA_EMAIL }}
+          create_credentials_file: "true"
+          token_format: "access_token"
+
+      - name: Download Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-${{ matrix.dir }}
+          path: ${{ format('opentofu/{0}', matrix.dir) }}
+
+      - name: OpenTofu Init
+        working-directory: ${{ format('opentofu/{0}', matrix.dir) }}
+        run: tofu init
+
+      - name: OpenTofu Apply
+        working-directory: ${{ format('opentofu/{0}', matrix.dir) }}
+        run: tofu apply -auto-approve -no-color tfplan
