@@ -68,6 +68,26 @@ resource "google_storage_bucket_iam_member" "gh_plan_backend" {
     member   = "serviceAccount:${google_service_account.gh_plan.email}"
 }
 
+resource "google_project_iam_custom_role" "gh_plan_bucket_iam_editor" {
+    project   = data.google_project.k8s_lab.project_id
+    role_id   = "gh_plan_bucket_iam_editor"
+    title     = "Bucket IAM Editor"
+    description = "Least privilege role for editing bucket IAM policies"
+    permissions = [
+        "storage.buckets.getIamPolicy",
+        "storage.buckets.setIamPolicy",
+    ]
+}
+
+resource "google_project_iam_member" "gh_plan_bucket_iam_editor" {
+    for_each = toset([
+        google_service_account.gh_plan.account_id,
+    ])
+    project = data.google_project.k8s_lab.project_id
+    role    = "projects/${data.google_project.k8s_lab.project_id}/roles/gh_plan_bucket_iam_editor"
+    member  = "serviceAccount:${google_service_account.gh_plan.email}"
+}
+
 resource "google_iam_workload_identity_pool" "k8s_pool" {
     project                   = data.google_project.k8s_lab.project_id
     workload_identity_pool_id = local.wif_pool
