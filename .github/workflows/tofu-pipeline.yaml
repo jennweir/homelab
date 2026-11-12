@@ -11,15 +11,18 @@ permissions:
   contents: read
   pull-requests: write
 
-env:
-  TOFU_DIR: "opentofu/k8s-lab"
-
 jobs:
   plan:
     name: Plan - ${{ matrix.dir }}
     strategy:
       matrix:
-        dir: [k8s-lab, pi-cluster]
+        include:
+          - dir: k8s-lab
+            wif_provider: ${{ vars.WIF_PROVIDER_K8S_LAB }}
+            service_account: ${{ vars.GSA_EMAIL_K8S_LAB_PLAN }}
+          - dir: pi-cluster
+            wif_provider: ${{ vars.WIF_PROVIDER_PI_CLUSTER }}
+            service_account: ${{ vars.GSA_EMAIL_PI_CLUSTER_PLAN }}
       fail-fast: false
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -39,8 +42,8 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v3
         with:
-          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
-          service_account: ${{ vars.GSA_EMAIL }}
+          workload_identity_provider: ${{ matrix.wif_provider }}
+          service_account: ${{ matrix.service_account }}
           create_credentials_file: "true"
           token_format: "access_token"
 
@@ -150,7 +153,13 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     strategy:
       matrix:
-        dir: [k8s-lab, pi-cluster]
+        include:
+          - dir: k8s-lab
+            wif_provider: ${{ vars.WIF_PROVIDER_K8S_LAB }}
+            service_account: ${{ vars.GSA_EMAIL_K8S_LAB_APPLY }}
+          - dir: pi-cluster
+            wif_provider: ${{ vars.WIF_PROVIDER_PI_CLUSTER }}
+            service_account: ${{ vars.GSA_EMAIL_PI_CLUSTER_APPLY }}
       fail-fast: false
     environment: production
     timeout-minutes: 30
@@ -171,8 +180,8 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v3
         with:
-          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
-          service_account: ${{ vars.GSA_EMAIL }}
+          workload_identity_provider: ${{ matrix.wif_provider }}
+          service_account: ${{ matrix.service_account }}
           create_credentials_file: "true"
           token_format: "access_token"
 
