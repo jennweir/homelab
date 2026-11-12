@@ -1,7 +1,7 @@
 name: PR Comment Trigger
 
 on:
-  pull_request_review_comment:
+  issue_comment:
     types: [created]
 
 permissions:
@@ -9,25 +9,31 @@ permissions:
   contents: read
   pull-requests: write
 
-env:
-  TOFU_DIR: "opentofu/k8s-lab"
-
 jobs:
   plan:
-    name: Plan (re-triggered)
+    name: Plan ${{ matrix.dir }}
     if: |
-      startsWith(github.event.comment.body, '/test') ||
-      startsWith(github.event.comment.body, '/tofu plan')
+      github.event.issue.pull_request &&
+      (startsWith(github.event.comment.body, '/test') || startsWith(github.event.comment.body, '/tofu plan'))
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        dir:
+          - opentofu/k8s-lab
+          - opentofu/pi-cluster
+
     steps:
       - name: Extract command
         id: extract
         run: |
           echo "command=$(echo '${{ github.event.comment.body }}' | head -1 | awk '{print $1}')" >> "$GITHUB_OUTPUT"
 
-      - name: Checkout
+      - name: Checkout PR branch
         uses: actions/checkout@v7.0.1
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
 
       - name: Setup OpenTofu
         uses: opentofu/setup-opentofu@v2.0.2
@@ -45,17 +51,17 @@ jobs:
           service_account: ${{ vars.GSA_EMAIL }}
 
       - name: OpenTofu Init
-        working-directory: ${{ env.TOFU_DIR }}
+        working-directory: ${{ matrix.dir }}
         run: tofu init
 
       - name: OpenTofu Plan
         id: plan
-        working-directory: ${{ env.TOFU_DIR }}
+        working-directory: ${{ matrix.dir }}
         run: tofu plan -no-color -detailed-exitcode -out=tfplan || echo "exit_code=$?" >> "$GITHUB_OUTPUT"
 
       - name: Format Plan Output
         id: format
-        working-directory: ${{ env.TOFU_DIR }}
+        working-directory: ${{ matrix.dir }}
         run: |
           tofu plan -no-color -detailed-exitcode 2>&1 > plan_output.txt || true
           if [ -s plan_output.txt ]; then
@@ -69,12 +75,11 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v7.0.2
         with:
-          name: tfplan-comment-trigger
-          path: ${{ env.TOFU_DIR }}/tfplan
+          name: tfplan-${{ matrix.dir == 'opentofu/k8s-lab' && 'k8s-lab' || 'pi-cluster' }}
+          path: ${{ matrix.dir }}/tfplan
           retention-days: 1
 
       - name: Comment on PR
-        if: github.event_name == 'pull_request_review_comment'
         uses: actions/github-script@v9.0.0
         with:
           script: |
@@ -82,20 +87,20 @@ jobs:
 
             let planOutput = 'Plan output not available.';
             try {
-              planOutput = fs.readFileSync('${{ env.TOFU_DIR }}/plan_output.txt', 'utf8');
+              planOutput = fs.readFileSync('${{ matrix.dir }}/plan_output.txt', 'utf8');
             } catch (e) {
               planOutput = 'Plan output not available.';
             }
 
             const hasChanges = planOutput.includes('+ resource') || planOutput.includes('+ ') || planOutput.includes('Plan:');
 
+            const headerText = '## OpenTofu Plan for `${{ matrix.dir }}` *(re-triggered)*';
+
             const body = [
-              '## OpenTofu Plan *(re-triggered)*',
+              headerText,
               '',
-              hasChanges
-                ? '<details><summary>Click to see plan output</summary>'
-                : '',
-              hasChanges ? '```' : '',
+              hasChanges ? '<details><summary>Click to see plan output</summary>' : '',
+              hasChanges ? '```hcl' : '',
               planOutput,
               hasChanges ? '```' : '',
               hasChanges ? '</details>' : '',
@@ -112,7 +117,7 @@ jobs:
 
             const botComment = comments.find(c =>
               c.user.login === 'github-actions[bot]' &&
-              c.body && c.body.includes('OpenTofu Plan')
+              c.body && c.body.includes(headerText)
             );
 
             if (botComment) {
@@ -134,5 +139,5 @@ jobs:
       - name: Exit with error if plan detected changes
         if: steps.plan.outputs.exit_code != '0'
         run: |
-          echo "::error::OpenTofu plan detected changes. Review the PR comment."
+          echo "::error::OpenTofu plan for ${{ matrix.dir }} detected changes. Review the PR comment."
           exit 1
