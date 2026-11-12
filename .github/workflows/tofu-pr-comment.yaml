@@ -43,9 +43,7 @@ jobs:
         with:
           workload_identity_provider: ${{ vars.WIF_PROVIDER }}
           service_account: ${{ vars.GSA_EMAIL }}
-          create_credentials_file: "true"
-          token_format: "access_token"
-          audience: "github.com"
+          id_token: true
 
       - name: OpenTofu Init
         working-directory: ${{ env.TOFU_DIR }}

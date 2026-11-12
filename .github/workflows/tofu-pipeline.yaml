@@ -44,9 +44,7 @@ jobs:
         with:
           workload_identity_provider: ${{ matrix.wif_provider }}
           service_account: ${{ matrix.service_account }}
-          create_credentials_file: "true"
-          token_format: "access_token"
-          audience: "github.com"
+          id_token: true
 
       - name: OpenTofu Init
         id: init
@@ -183,9 +181,7 @@ jobs:
         with:
           workload_identity_provider: ${{ matrix.wif_provider }}
           service_account: ${{ matrix.service_account }}
-          create_credentials_file: "true"
-          token_format: "access_token"
-          audience: "github.com"
+          id_token: true
 
       - name: Download Plan
         uses: actions/download-artifact@v4
