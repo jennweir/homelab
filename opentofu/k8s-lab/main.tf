@@ -60,9 +60,12 @@ resource "google_storage_bucket" "opentofu_backend" {
 }
 
 resource "google_storage_bucket_iam_member" "gh_plan_backend" {
-    bucket = google_storage_bucket.opentofu_backend.name
-    role   = "roles/storage.objectViewer"
-    member = "serviceAccount:${google_service_account.gh_plan.email}"
+    for_each = toset([
+        "roles/storage.objectViewer",
+    ])
+    bucket   = google_storage_bucket.opentofu_backend.name
+    role     = each.value
+    member   = "serviceAccount:${google_service_account.gh_plan.email}"
 }
 
 resource "google_iam_workload_identity_pool" "k8s_pool" {
