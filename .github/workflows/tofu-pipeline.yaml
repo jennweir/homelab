@@ -44,7 +44,6 @@ jobs:
         with:
           workload_identity_provider: ${{ matrix.wif_provider }}
           service_account: ${{ matrix.service_account }}
-          id_token: true
 
       - name: OpenTofu Init
         id: init
@@ -181,7 +180,6 @@ jobs:
         with:
           workload_identity_provider: ${{ matrix.wif_provider }}
           service_account: ${{ matrix.service_account }}
-          id_token: true
 
       - name: Download Plan
         uses: actions/download-artifact@v4

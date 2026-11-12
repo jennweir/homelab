@@ -43,7 +43,6 @@ jobs:
         with:
           workload_identity_provider: ${{ vars.WIF_PROVIDER }}
           service_account: ${{ vars.GSA_EMAIL }}
-          id_token: true
 
       - name: OpenTofu Init
         working-directory: ${{ env.TOFU_DIR }}

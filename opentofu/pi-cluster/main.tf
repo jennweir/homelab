@@ -27,6 +27,7 @@ resource "google_iam_workload_identity_pool_provider" "gh_provider" {
     description                        = "GitHub Actions OIDC provider"
     workload_identity_pool_id          = google_iam_workload_identity_pool.gh_pool.workload_identity_pool_id
     workload_identity_pool_provider_id = local.gh_provider
+    
     attribute_mapping = {
         "google.subject"             = "assertion.sub"
         "attribute.repository"       = "assertion.repository"
@@ -34,9 +35,9 @@ resource "google_iam_workload_identity_pool_provider" "gh_provider" {
     }
 
     attribute_condition = "assertion.repository_owner == 'jennweir'"
+
     oidc {
         issuer_uri        = "https://token.actions.githubusercontent.com"
-        allowed_audiences = ["github.com"]
     }
 }
 
