@@ -47,6 +47,24 @@ resource "google_storage_bucket_iam_member" "homelab_bucket" {
     member = "allUsers"
 }
 
+resource "google_storage_bucket" "opentofu_backend" {
+    project     = data.google_project.k8s_lab.project_id
+    name        = "opentofu-backend-k8s-lab"
+    location    = "US"
+    force_destroy               = false
+    public_access_prevention    = "enforced"
+    uniform_bucket_level_access = true
+    versioning {
+        enabled = true
+    }
+}
+
+resource "google_storage_bucket_iam_member" "gh_plan_backend" {
+    bucket = google_storage_bucket.opentofu_backend.name
+    role   = "roles/storage.objectViewer"
+    member = "serviceAccount:${google_service_account.gh_plan.email}"
+}
+
 resource "google_iam_workload_identity_pool" "k8s_pool" {
     project                   = data.google_project.k8s_lab.project_id
     workload_identity_pool_id = local.wif_pool

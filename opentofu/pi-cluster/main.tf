@@ -13,6 +13,24 @@ locals {
     gh_provider = "gh-provider"
 }
 
+resource "google_storage_bucket" "opentofu_backend" {
+    project     = data.google_project.pi_cluster.project_id
+    name        = "opentofu-backend-pi-cluster"
+    location    = "US"
+    force_destroy               = false
+    public_access_prevention    = "enforced"
+    uniform_bucket_level_access = true
+    versioning {
+        enabled = true
+    }
+}
+
+resource "google_storage_bucket_iam_member" "gh_plan_backend" {
+    bucket = google_storage_bucket.opentofu_backend.name
+    role   = "roles/storage.objectViewer"
+    member = "serviceAccount:${google_service_account.gh_plan.email}"
+}
+
 # GitHub Actions WIF pool and provider
 resource "google_iam_workload_identity_pool" "gh_pool" {
     project                   = data.google_project.pi_cluster.project_id
