@@ -1,0 +1,143 @@
+name: PR Comment Trigger
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  plan:
+    name: Plan ${{ matrix.dir }}
+    if: |
+      github.event.issue.pull_request &&
+      (startsWith(github.event.comment.body, '/test') || startsWith(github.event.comment.body, '/tofu plan'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        dir:
+          - opentofu/k8s-lab
+          - opentofu/pi-cluster
+
+    steps:
+      - name: Extract command
+        id: extract
+        run: |
+          echo "command=$(echo '${{ github.event.comment.body }}' | head -1 | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
+
+      - name: Setup OpenTofu
+        uses: opentofu/setup-opentofu@v2.0.2
+        with:
+          tofu_version: "1.10.0"
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v3.0.1
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.GSA_EMAIL }}
+
+      - name: OpenTofu Init
+        working-directory: ${{ matrix.dir }}
+        run: tofu init
+
+      - name: OpenTofu Plan
+        id: plan
+        working-directory: ${{ matrix.dir }}
+        run: tofu plan -no-color -detailed-exitcode -out=tfplan || echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+
+      - name: Format Plan Output
+        id: format
+        working-directory: ${{ matrix.dir }}
+        run: |
+          tofu plan -no-color -detailed-exitcode 2>&1 > plan_output.txt || true
+          if [ -s plan_output.txt ]; then
+            if [ $(wc -c < plan_output.txt) -gt 65000 ]; then
+              head -c 65000 plan_output.txt > plan_output.txt
+              echo "..." >> plan_output.txt
+            fi
+          fi
+
+      - name: Upload Plan Artifact
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: tfplan-${{ matrix.dir == 'opentofu/k8s-lab' && 'k8s-lab' || 'pi-cluster' }}
+          path: ${{ matrix.dir }}/tfplan
+          retention-days: 1
+
+      - name: Comment on PR
+        uses: actions/github-script@v9.0.0
+        with:
+          script: |
+            const fs = require('fs');
+
+            let planOutput = 'Plan output not available.';
+            try {
+              planOutput = fs.readFileSync('${{ matrix.dir }}/plan_output.txt', 'utf8');
+            } catch (e) {
+              planOutput = 'Plan output not available.';
+            }
+
+            const hasChanges = planOutput.includes('+ resource') || planOutput.includes('+ ') || planOutput.includes('Plan:');
+
+            const headerText = '## OpenTofu Plan for `${{ matrix.dir }}` *(re-triggered)*';
+
+            const body = [
+              headerText,
+              '',
+              hasChanges ? '<details><summary>Click to see plan output</summary>' : '',
+              hasChanges ? '```hcl' : '',
+              planOutput,
+              hasChanges ? '```' : '',
+              hasChanges ? '</details>' : '',
+              '',
+              hasChanges ? `> Triggered by **${{ github.event.comment.user.login }}** via \`/test\`` : `> Triggered by **${{ github.event.comment.user.login }}** via \`/test\` — no changes detected`,
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              per_page: 100
+            });
+
+            const botComment = comments.find(c =>
+              c.user.login === 'github-actions[bot]' &&
+              c.body && c.body.includes(headerText)
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+
+      - name: Exit with error if plan detected changes
+        if: steps.plan.outputs.exit_code != '0'
+        run: |
+          echo "::error::OpenTofu plan for ${{ matrix.dir }} detected changes. Review the PR comment."
+          exit 1

@@ -1,7 +1,7 @@
 terraform { 
   backend "gcs" {
     bucket = "jennweir-terraform-backend"
-    prefix = "terraform/state/k8s-lab"
+    prefix = "opentofu/state/k8s-lab"
   }
   required_providers {
     google = {
