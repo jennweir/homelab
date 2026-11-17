@@ -101,8 +101,23 @@ jobs:
             console.log('hasChanges:', hasChanges);
             console.log('planMatch:', planMatch);
 
+            const headerText = '## OpenTofu Plan for `${{ matrix.dir }}` *(pipeline)*';
+
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              per_page: 100,
+            });
+
+            const prefix = 'opentofu/${{ matrix.dir }}/';
+            if (!files.some(file => file.filename.startsWith(prefix))) {
+              console.log(`No changed files under ${prefix} — skipping comment.`);
+              return;
+            }
+
             const body = [
-              '## OpenTofu Plan',
+              headerText,
               '',
               hasChanges
                 ? '### ⚠️ **Changes detected**'
@@ -123,7 +138,7 @@ jobs:
 
               const botComment = comments.find(c =>
                 c.user.login === 'github-actions[bot]' &&
-                c.body && c.body.includes('## OpenTofu Plan')
+                c.body && c.body.includes(headerText)
               );
 
               if (botComment) {
