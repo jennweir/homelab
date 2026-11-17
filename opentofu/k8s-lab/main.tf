@@ -188,11 +188,11 @@ resource "google_service_account_iam_member" "gh_apply_wif_binding" {
     member             = "principal://iam.googleapis.com/projects/${data.google_project.k8s_lab.number}/locations/global/workloadIdentityPools/${local.gh_pool}/subject/repo:jennweir/homelab:ref:refs/heads/main"
 }
 
-# resource "google_service_account" "test_gsm_accessor" {
-#     account_id   = "test-gsm-accessor"
-#     display_name = "GSM Accessor Service Account for Testing"
-#     project      = data.google_project.k8s_lab.project_id
-# }
+resource "google_service_account" "test_gsm_accessor" {
+    account_id   = "test-gsm-accessor"
+    display_name = "GSM Accessor Service Account for Testing"
+    project      = data.google_project.k8s_lab.project_id
+}
 
 # resource "google_secret_manager_secret_iam_member" "test_secret_access" {
 #     project   = data.google_project.k8s_lab.project_id
