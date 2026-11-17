@@ -92,22 +92,16 @@ jobs:
             const planMatch = planOutput.match(/Plan:\s*(\d+)\s+to add,\s*(\d+)\s+to change,\s*(\d+)\s+to destroy\./);
             const hasChanges = planMatch && (parseInt(planMatch[1]) > 0 || parseInt(planMatch[2]) > 0 || parseInt(planMatch[3]) > 0);
 
-            if (!hasChanges) {
-              return;
-            }
-
             const body = [
               '## OpenTofu Plan',
               '',
-              `<details>`,
-              `<summary>Plan for ${{ matrix.dir }}</summary>`,
+              hasChanges
+                ? '### ⚠️ **Changes detected**'
+                : '### ✅ **No changes detected**',
               '',
-              '```',
-              planOutput,
-              '```',
-              '',
-              '</details>',
-              '',
+              hasChanges
+                ? ['```', planOutput, '```'].join('\n')
+                : 'Infrastructure is up to date.',
               `> Triggered by **${{ github.actor }}**`,
             ].join('\n');
 
@@ -120,8 +114,7 @@ jobs:
 
             const botComment = comments.find(c =>
               c.user.login === 'github-actions[bot]' &&
-              c.body && c.body.includes('## OpenTofu Plan') &&
-              c.body.includes('${{ matrix.dir }}')
+              c.body && c.body.includes('## OpenTofu Plan')
             );
 
             if (botComment) {
