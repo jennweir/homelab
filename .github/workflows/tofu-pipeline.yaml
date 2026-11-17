@@ -149,7 +149,7 @@ jobs:
   apply:
     name: Apply - ${{ matrix.dir }}
     needs: plan
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: github.event.action == 'closed' && github.event.pull_request.merged == true
     strategy:
       matrix:
         include:
