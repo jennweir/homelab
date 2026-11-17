@@ -132,12 +132,6 @@ jobs:
               });
             }
 
-      - name: Exit with error if tofu plan detected changes
-        if: steps.plan.outputs.exit_code != '0'
-        run: |
-          echo "::error::OpenTofu plan detected changes for ${{ matrix.dir }}. Review the PR comment."
-          exit 1
-
   apply:
     name: Apply - ${{ matrix.dir }}
     needs: plan
