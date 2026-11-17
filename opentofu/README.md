@@ -2,27 +2,18 @@
 
 Manages Google Cloud and Azure AD resources with [OpenTofu](https://opentofu.org/).
 
-## Usage
+## CI/CD Pipeline
 
-### 1. Authenticate to Google Cloud
+Changes are applied via GitHub Actions with Workload Identity Federation.
 
-The GCS backend uses Application Default Credentials (ADC). Log in once per
-machine (or when the ADC session expires):
+### Triggers
 
-```bash
-gcloud auth application-default login
-```
+| Trigger                                 | Action                                               |
+| --------------------------------------- | ---------------------------------------------------- |
+| PR to `main` with `opentofu/**` changes | Plan: comments diff on PR, fails on detected changes |
+| PR merge                                | Apply: runs saved plan                               |
+| `/test` or `/tofu plan` comment on PR   | Re-triggers plan                                     |
 
-### 2. Apply IaC changes
+## State
 
-```bash
-cd opentofu/k8s-lab
-tofu init
-tofu plan
-tofu apply
-```
-
-State is stored in the `jennweir-terraform-backend` GCS bucket:
-`gs://jennweir-terraform-backend/terraform/state/k8s-lab/`.
-
-For the pi-lab cluster, see `opentofu/pi-cluster/` for GCP/WIF and Azure AD app registration infrastructure.
+Managed in GCS buckets in each respective project.

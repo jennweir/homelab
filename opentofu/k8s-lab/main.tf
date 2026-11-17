@@ -305,7 +305,6 @@ resource "google_service_account_iam_member" "cert_manager_wif_binding" {
 # }
 
 # Azure ------------------------------------------------------------------------------------------------------------------
-
 resource "azuread_application" "okd_cluster" {
     display_name = "okd-cluster"
     web {
