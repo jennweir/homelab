@@ -142,7 +142,6 @@ resource "google_iam_workload_identity_pool_provider" "gh_provider" {
 }
 
 # Pipeline service accounts for GitHub Actions
-
 resource "google_service_account" "gh_plan" {
     account_id   = "gh-plan"
     display_name = "CI/CD Plan Pipeline Service Account"

@@ -1,7 +1,7 @@
 name: PR Comment Trigger
 
 on:
-  pull_request_comment:
+  issue_comment:
     types: [created]
 
 permissions:
@@ -76,7 +76,7 @@ jobs:
           retention-days: 1
 
       - name: Comment on PR
-        if: github.event_name == 'pull_request_comment'
+        if: github.event_name == 'issue_comment'
         uses: actions/github-script@v7
         with:
           script: |
