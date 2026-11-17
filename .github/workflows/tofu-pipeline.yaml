@@ -61,7 +61,7 @@ jobs:
         id: format
         working-directory: ${{ format('opentofu/{0}', matrix.dir) }}
         run: |
-          tofu plan -no-color -detailed-exitcode 2>&1 > plan_output.txt || true
+          tofu plan -no-color -detailed-exitcode -var="azure_tenant_id=${{ matrix.azure_tenant_id }}" 2>&1 > plan_output.txt || true
           if [ -s plan_output.txt ]; then
             if [ $(wc -c < plan_output.txt) -gt 65000 ]; then
               head -c 65000 plan_output.txt > plan_output.txt
@@ -91,7 +91,8 @@ jobs:
               planOutput = 'Plan output not available.';
             }
 
-            const hasChanges = planOutput.includes('+ resource') || planOutput.includes('+ ') || planOutput.includes('Plan:');
+            const planMatch = planOutput.match(/Plan:\s*(\d+)\s+to add,\s*(\d+)\s+to change,\s*(\d+)\s+to destroy\./);
+            const hasChanges = planMatch && (parseInt(planMatch[1]) > 0 || parseInt(planMatch[2]) > 0 || parseInt(planMatch[3]) > 0);
 
             if (!hasChanges) {
               return;
