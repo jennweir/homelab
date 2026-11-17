@@ -101,6 +101,16 @@ jobs:
             console.log('hasChanges:', hasChanges);
             console.log('planMatch:', planMatch);
 
+            const filteredPlanOutput = planOutput
+              .split('\n')
+              .filter(line =>
+                !line.includes('Refreshing state...') &&
+                !line.includes(': Reading...') &&
+                !line.includes(': Read complete')
+              )
+              .join('\n')
+              .trim();
+
             const headerText = '## OpenTofu Plan for `${{ matrix.dir }}` *(pipeline)*';
 
             const files = await github.paginate(github.rest.pulls.listFiles, {
@@ -124,7 +134,7 @@ jobs:
                 : '### ✅ **No changes detected**',
               '',
               hasChanges
-                ? ['```', planOutput, '```'].join('\n')
+                ? ['```', filteredPlanOutput, '```'].join('\n')
                 : 'Infrastructure is up to date.',
             ].join('\n');
 
