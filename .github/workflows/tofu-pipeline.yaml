@@ -82,7 +82,7 @@ jobs:
           script: |
             const fs = require('fs');
 
-            let planOutput = 'No changes detected.';
+            let planOutput = 'Plan output not available.';
             try {
               planOutput = fs.readFileSync('${{ format('opentofu/{0}/', matrix.dir) }}plan_output.txt', 'utf8') || 'Plan output not available.';
             } catch (e) {
@@ -91,6 +91,10 @@ jobs:
 
             const planMatch = planOutput.match(/Plan:\s*(\d+)\s+to add,\s*(\d+)\s+to change,\s*(\d+)\s+to destroy\./);
             const hasChanges = planMatch && (parseInt(planMatch[1]) > 0 || parseInt(planMatch[2]) > 0 || parseInt(planMatch[3]) > 0);
+
+            console.log('issue_number:', context.issue.number);
+            console.log('hasChanges:', hasChanges);
+            console.log('planMatch:', planMatch);
 
             const body = [
               '## OpenTofu Plan',
@@ -104,34 +108,39 @@ jobs:
                 : 'Infrastructure is up to date.',
             ].join('\n');
 
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              per_page: 100
-            });
-
-            const botComment = comments.find(c =>
-              c.user.login === 'github-actions[bot]' &&
-              c.body && c.body.includes('## OpenTofu Plan')
-            );
-
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: body
-              });
-            } else {
-              await github.rest.issues.createComment({
+            try {
+              const { data: comments } = await github.rest.issues.listComments({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: context.issue.number,
-                body: body
+                per_page: 100
               });
-            }
 
+              const botComment = comments.find(c =>
+                c.user.login === 'github-actions[bot]' &&
+                c.body && c.body.includes('## OpenTofu Plan')
+              );
+
+              if (botComment) {
+                await github.rest.issues.updateComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  comment_id: botComment.id,
+                  body: body
+                });
+              } else {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  body: body
+                });
+              }
+              console.log('Comment posted/updated successfully');
+            } catch (e) {
+              console.error('Failed to post comment:', e.message);
+              throw e;
+            }
   apply:
     name: Apply - ${{ matrix.dir }}
     needs: plan
