@@ -20,9 +20,11 @@ jobs:
           - dir: k8s-lab
             wif_provider: ${{ vars.WIF_PROVIDER_K8S_LAB }}
             service_account: ${{ vars.GSA_EMAIL_K8S_LAB_PLAN }}
+            azure_tenant_id: ${{ vars.AZURE_TENANT_ID }}
           - dir: pi-cluster
             wif_provider: ${{ vars.WIF_PROVIDER_PI_CLUSTER }}
             service_account: ${{ vars.GSA_EMAIL_PI_CLUSTER_PLAN }}
+            azure_tenant_id: ${{ vars.AZURE_TENANT_ID }}
       fail-fast: false
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -53,9 +55,7 @@ jobs:
       - name: OpenTofu Plan
         id: plan
         working-directory: ${{ format('opentofu/{0}', matrix.dir) }}
-        env:
-          TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
-        run: tofu plan -no-color -detailed-exitcode -out=tfplan || echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+        run: tofu plan -no-color -detailed-exitcode -out=tfplan -var="azure_tenant_id=${{ matrix.azure_tenant_id }}" || echo "exit_code=$?" >> "$GITHUB_OUTPUT"
 
       - name: Format Plan Output
         id: format
@@ -157,9 +157,11 @@ jobs:
           - dir: k8s-lab
             wif_provider: ${{ vars.WIF_PROVIDER_K8S_LAB }}
             service_account: ${{ vars.GSA_EMAIL_K8S_LAB_APPLY }}
+            azure_tenant_id: ${{ vars.AZURE_TENANT_ID }}
           - dir: pi-cluster
             wif_provider: ${{ vars.WIF_PROVIDER_PI_CLUSTER }}
             service_account: ${{ vars.GSA_EMAIL_PI_CLUSTER_APPLY }}
+            azure_tenant_id: ${{ vars.AZURE_TENANT_ID }}
       fail-fast: false
     environment: production
     timeout-minutes: 30
@@ -195,4 +197,4 @@ jobs:
 
       - name: OpenTofu Apply
         working-directory: ${{ format('opentofu/{0}', matrix.dir) }}
-        run: tofu apply -auto-approve -no-color tfplan
+        run: tofu apply -auto-approve -no-color -var="azure_tenant_id=${{ matrix.azure_tenant_id }}" tfplan
