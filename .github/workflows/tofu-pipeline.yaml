@@ -102,7 +102,6 @@ jobs:
               hasChanges
                 ? ['```', planOutput, '```'].join('\n')
                 : 'Infrastructure is up to date.',
-              `> Triggered by **${{ github.actor }}**`,
             ].join('\n');
 
             const { data: comments } = await github.rest.issues.listComments({
