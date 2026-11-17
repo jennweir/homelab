@@ -56,16 +56,17 @@ jobs:
         id: plan
         working-directory: ${{ format('opentofu/{0}', matrix.dir) }}
         run: |
-          tofu plan -no-color -detailed-exitcode -out=tfplan -var="azure_tenant_id=${{ matrix.azure_tenant_id }}" 2>&1 | tee plan_output.txt || true
-          if [ $(wc -c < plan_output.txt 2>/dev/null) -gt 65000 ]; then
-            head -c 65000 plan_output.txt > plan_output.txt
-            echo "..." >> plan_output.txt
+          set +e
+          tofu plan -no-color -detailed-exitcode -out=tfplan -var="azure_tenant_id=${{ matrix.azure_tenant_id }}" 2>&1 | tee plan_output.txt
+          exit_code=${PIPESTATUS[0]}
+          if [ -s plan_output.txt ]; then
+            if [ $(wc -c < plan_output.txt) -gt 65000 ]; then
+              head -c 65000 plan_output.txt > plan_output.txt
+              echo "..." >> plan_output.txt
+            fi
           fi
           changes=$(grep -oP 'Plan: \K\d+' plan_output.txt || echo "0")
-          echo "exit_code=0" >> "$GITHUB_OUTPUT"
-          if [ "$changes" -gt 0 ] 2>/dev/null; then
-            echo "exit_code=1" >> "$GITHUB_OUTPUT"
-          fi
+          echo "exit_code=${exit_code}" >> "$GITHUB_OUTPUT"
 
       - name: Upload Plan Artifact
         if: always()
