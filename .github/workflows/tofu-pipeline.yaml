@@ -53,6 +53,8 @@ jobs:
       - name: OpenTofu Plan
         id: plan
         working-directory: ${{ format('opentofu/{0}', matrix.dir) }}
+        env:
+          TF_VAR_azure_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
         run: tofu plan -no-color -detailed-exitcode -out=tfplan || echo "exit_code=$?" >> "$GITHUB_OUTPUT"
 
       - name: Format Plan Output
