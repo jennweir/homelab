@@ -20,11 +20,9 @@ jobs:
           - dir: k8s-lab
             wif_provider: ${{ vars.GH_WIF_PROVIDER_K8S_LAB }}
             service_account: ${{ vars.GSA_EMAIL_K8S_LAB_PLAN }}
-            azure_tenant_id: ${{ vars.AZURE_TENANT_ID }}
           - dir: pi-cluster
             wif_provider: ${{ vars.GH_WIF_PROVIDER_PI_CLUSTER }}
             service_account: ${{ vars.GSA_EMAIL_PI_CLUSTER_PLAN }}
-            azure_tenant_id: ""
       fail-fast: false
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -56,11 +54,7 @@ jobs:
         id: plan
         working-directory: ${{ format('opentofu/{0}', matrix.dir) }}
         run: |
-          if [ -n "${{ matrix.azure_tenant_id }}" ]; then
-            tofu plan -no-color -detailed-exitcode -out=tfplan -var="azure_tenant_id=${{ matrix.azure_tenant_id }}" 2>&1 | tee plan_output.txt
-          else
-            tofu plan -no-color -detailed-exitcode -out=tfplan 2>&1 | tee plan_output.txt
-          fi
+          tofu plan -no-color -detailed-exitcode -out=tfplan 2>&1 | tee plan_output.txt
           exit_code=${PIPESTATUS[0]}
           if [ -s plan_output.txt ]; then
             if [ $(wc -c < plan_output.txt) -gt 65000 ]; then
@@ -158,11 +152,9 @@ jobs:
           - dir: k8s-lab
             wif_provider: ${{ vars.GH_WIF_PROVIDER_K8S_LAB }}
             service_account: ${{ vars.GSA_EMAIL_K8S_LAB_APPLY }}
-            azure_tenant_id: ${{ vars.AZURE_TENANT_ID }}
           - dir: pi-cluster
             wif_provider: ${{ vars.GH_WIF_PROVIDER_PI_CLUSTER }}
             service_account: ${{ vars.GSA_EMAIL_PI_CLUSTER_APPLY }}
-            azure_tenant_id: ${{ vars.AZURE_TENANT_ID }}
       fail-fast: false
     environment: production
     timeout-minutes: 30
@@ -198,4 +190,4 @@ jobs:
 
       - name: OpenTofu Apply
         working-directory: ${{ format('opentofu/{0}', matrix.dir) }}
-        run: tofu apply -auto-approve -no-color -var="azure_tenant_id=${{ matrix.azure_tenant_id }}" tfplan
+        run: tofu apply -auto-approve -no-color tfplan

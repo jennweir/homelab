@@ -305,13 +305,13 @@ resource "google_service_account_iam_member" "cert_manager_wif_binding" {
 # }
 
 # Azure ------------------------------------------------------------------------------------------------------------------
-resource "azuread_application" "okd_cluster" {
-    display_name = "okd-cluster"
-    web {
-        redirect_uris = [
-            "https://oauth-openshift.apps.okd.jenniferpweir.com/oauth2callback/Azure_AD",
-            "https://console-openshift-console.apps.okd.jenniferpweir.com/auth/callback",
-            "https://argocd-server-argocd.apps.okd.jenniferpweir.com/auth/callback"
-        ]
-    }
-}
+# resource "azuread_application" "okd_cluster" {
+#     display_name = "okd-cluster"
+#     web {
+#         redirect_uris = [
+#             "https://oauth-openshift.apps.okd.jenniferpweir.com/oauth2callback/Azure_AD",
+#             "https://console-openshift-console.apps.okd.jenniferpweir.com/auth/callback",
+#             "https://argocd-server-argocd.apps.okd.jenniferpweir.com/auth/callback"
+#         ]
+#     }
+# }
