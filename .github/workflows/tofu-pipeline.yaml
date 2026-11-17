@@ -58,7 +58,7 @@ jobs:
         id: plan
         working-directory: ${{ format('opentofu/{0}', matrix.dir) }}
         run: |
-          tofu plan -no-color -detailed-exitcode -out=tfplan 2>&1 | tee plan_output.txt
+          tofu plan -no-color -detailed-exitcode -lock-timeout=10m -out=tfplan 2>&1 | tee plan_output.txt
           exit_code=${PIPESTATUS[0]}
           if [ -s plan_output.txt ]; then
             if [ $(wc -c < plan_output.txt) -gt 65000 ]; then
@@ -194,4 +194,4 @@ jobs:
 
       - name: OpenTofu Apply
         working-directory: ${{ format('opentofu/{0}', matrix.dir) }}
-        run: tofu apply -auto-approve -no-color tfplan
+        run: tofu apply -auto-approve -no-color -lock-timeout=10m tfplan
