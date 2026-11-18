@@ -28,7 +28,7 @@ jobs:
             wif_provider: ${{ vars.GH_WIF_PROVIDER_PI_CLUSTER }}
             service_account: ${{ vars.GSA_EMAIL_PI_CLUSTER_PLAN }}
       fail-fast: false
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - name: Checkout
@@ -187,7 +187,7 @@ jobs:
       fail-fast: false
     environment: production
     timeout-minutes: 30
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1

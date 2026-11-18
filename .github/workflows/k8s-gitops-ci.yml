@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   k8s-gitops-ci:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     container:
       image: ghcr.io/arthurvardevanyan/k8s-gitops-ci:0.63.0@sha256:ace79fe17227d0cd9cc65d0cc59251af719d6911747f40f5b79b0ac8bdb45336
     steps:
