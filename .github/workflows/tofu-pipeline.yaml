@@ -33,6 +33,10 @@ jobs:
             service_account: ${{ vars.GSA_EMAIL_PI_CLUSTER_PLAN }}
       fail-fast: false
     runs-on: ubuntu-24.04
+    env:
+      ARM_USE_OIDC: true
+      ARM_CLIENT_ID: ${{ vars.ARM_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
     timeout-minutes: 30
     steps:
       - name: Checkout
@@ -192,6 +196,10 @@ jobs:
     environment: production
     timeout-minutes: 30
     runs-on: ubuntu-24.04
+    env:
+      ARM_USE_OIDC: true
+      ARM_CLIENT_ID: ${{ vars.ARM_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7.0.1
