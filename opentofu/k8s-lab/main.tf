@@ -293,4 +293,3 @@ resource "google_service_account_iam_member" "cert_manager_wif_binding" {
 #         ]
 #     }
 # }
-
