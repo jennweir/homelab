@@ -46,6 +46,13 @@ resource "google_storage_bucket_iam_member" "homelab_bucket" {
     member = "allUsers"
 }
 
+# allow the k8s-lab plan service account to release state locks
+resource "google_storage_bucket_iam_member" "gh_plan_state_admin" {
+    bucket = "jennweir-terraform-backend"
+    role   = "roles/storage.objectAdmin"
+    member = "serviceAccount:${google_service_account.gh_plan.email}"
+}
+
 resource "google_storage_bucket" "opentofu_backend" {
     project     = data.google_project.k8s_lab.project_id
     name        = "opentofu-backend-k8s-lab"
@@ -56,35 +63,6 @@ resource "google_storage_bucket" "opentofu_backend" {
     versioning {
         enabled = true
     }
-}
-
-resource "google_storage_bucket_iam_member" "gh_plan_backend" {
-    for_each = toset([
-        "roles/storage.objectViewer",
-    ])
-    bucket   = google_storage_bucket.opentofu_backend.name
-    role     = each.value
-    member   = "serviceAccount:${google_service_account.gh_plan.email}"
-}
-
-resource "google_project_iam_custom_role" "gh_plan_bucket_iam_editor" {
-    project   = data.google_project.k8s_lab.project_id
-    role_id   = "gh_plan_bucket_iam_editor"
-    title     = "Bucket IAM Editor"
-    description = "Least privilege role for editing bucket IAM policies"
-    permissions = [
-        "storage.buckets.getIamPolicy",
-        "storage.buckets.setIamPolicy",
-    ]
-}
-
-resource "google_project_iam_member" "gh_plan_bucket_iam_editor" {
-    for_each = toset([
-        google_service_account.gh_plan.account_id,
-    ])
-    project = data.google_project.k8s_lab.project_id
-    role    = "projects/${data.google_project.k8s_lab.project_id}/roles/gh_plan_bucket_iam_editor"
-    member  = "serviceAccount:${google_service_account.gh_plan.email}"
 }
 
 resource "google_iam_workload_identity_pool" "k8s_pool" {
@@ -305,14 +283,13 @@ resource "google_service_account_iam_member" "cert_manager_wif_binding" {
 # }
 
 # Azure ------------------------------------------------------------------------------------------------------------------
-
-resource "azuread_application" "okd_cluster" {
-    display_name = "okd-cluster"
-    web {
-        redirect_uris = [
-            "https://oauth-openshift.apps.okd.jenniferpweir.com/oauth2callback/Azure_AD",
-            "https://console-openshift-console.apps.okd.jenniferpweir.com/auth/callback",
-            "https://argocd-server-argocd.apps.okd.jenniferpweir.com/auth/callback"
-        ]
-    }
-}
+# resource "azuread_application" "okd_cluster" {
+#     display_name = "okd-cluster"
+#     web {
+#         redirect_uris = [
+#             "https://oauth-openshift.apps.okd.jenniferpweir.com/oauth2callback/Azure_AD",
+#             "https://console-openshift-console.apps.okd.jenniferpweir.com/auth/callback",
+#             "https://argocd-server-argocd.apps.okd.jenniferpweir.com/auth/callback"
+#         ]
+#     }
+# }
