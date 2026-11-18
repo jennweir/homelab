@@ -112,4 +112,3 @@ resource "google_project_iam_member" "gsm_accessor_role" {
     role    = "roles/secretmanager.secretAccessor"
     member  = "serviceAccount:${google_service_account.gsm_accessor.email}"
 }
-
