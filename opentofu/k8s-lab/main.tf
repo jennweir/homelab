@@ -236,6 +236,37 @@ resource "google_service_account_iam_member" "cert_manager_wif_binding" {
     member             = "principal://iam.googleapis.com/projects/${data.google_project.k8s_lab.number}/locations/global/workloadIdentityPools/${google_iam_workload_identity_pool.k8s_pool.workload_identity_pool_id}/subject/system:serviceaccount:cert-manager:cert-manager"
 }
 
+resource "google_service_account" "openshell_eso_sa" {
+    account_id   = "openshell-eso-sa"
+    display_name = "Openshell ESO Service Account for GSM access"
+    project      = data.google_project.k8s_lab.project_id
+}
+
+resource "google_service_account_iam_member" "openshell_wif_binding" {
+    service_account_id = "projects/${data.google_project.k8s_lab.project_id}/serviceAccounts/${google_service_account.openshell_eso_sa.email}"
+    role               = "roles/iam.workloadIdentityUser"
+    member             = "principal://iam.googleapis.com/projects/${data.google_project.k8s_lab.number}/locations/global/workloadIdentityPools/${google_iam_workload_identity_pool.k8s_pool.workload_identity_pool_id}/subject/system:serviceaccount:openshell:openshell-eso-sa"
+}
+
+resource "google_secret_manager_secret" "openshell_key_encryption_key" {
+    project   = data.google_project.k8s_lab.project_id
+    secret_id = "openshell-key"
+    replication {
+        user_managed {
+            replicas {
+                location = "us-central1"
+            }
+        }
+    }
+}
+
+resource "google_secret_manager_secret_iam_member" "openshell_secret_accessor" {
+    project   = data.google_project.k8s_lab.project_id
+    secret_id = google_secret_manager_secret.openshell_key_encryption_key.secret_id
+    role      = "roles/secretmanager.secretAccessor"
+    member    = "serviceAccount:${google_service_account.openshell_eso_sa.email}"
+}
+
 # make k8s service account secretAccessor directly instead of via impersonation of google service account bc of eso limitations
 # resource "google_secret_manager_secret_iam_member" "openshift_monitoring_secret_accessor" {
 #     project   = data.google_project.k8s_lab.project_id

@@ -1,0 +1,55 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: openshell-config
+  labels:
+    app.kubernetes.io/name: openshell
+    app.kubernetes.io/instance: openshell
+data:
+  gateway.toml: |
+
+    [openshell]
+    version = 2
+    [openshell.drivers.kubernetes]
+    allow_driver_config = false
+    client_tls_secret_name = "openshell-client-tls"
+    default_image = "nvcr.io/nvidia/base/ubuntu:24.04"
+    gateway_id = "openshell"
+    grpc_endpoint = "https://openshell.openshell.svc.cluster.local:8080"
+    namespace = "openshell"
+    sa_token_ttl_secs = 3600
+    sandbox_runtime = { boundary_port = 5500 }
+    sandbox_runtime_image_pull_policy = "if_not_present"
+    service_account_name = "openshell-sandbox"
+    supervisor_image = "ghcr.io/nvidia/openshell/supervisor:0.1.8"
+    supervisor_image_pull_policy = "if_not_present"
+    workspace_mode = "shared"
+    [openshell.drivers.kubernetes.managed_ssh_ingress]
+    enabled = true
+    gateway_namespace = "openshell"
+    gateway_pod_selector = { "app.kubernetes.io/instance" = "openshell", "app.kubernetes.io/name" = "openshell" }
+    [openshell.drivers.kubernetes.resource_admission]
+    enabled = true
+    [openshell.gateway]
+    bind_address = "0.0.0.0:8080"
+    compute_driver = "kubernetes"
+    disable_tls = false
+    enable_loopback_service_http = true
+    enable_websocket_tunnel = false
+    health_bind_address = "0.0.0.0:8081"
+    log_level = "info"
+    metrics_bind_address = "0.0.0.0:9090"
+    name = "openshell"
+    policy_validation_failure_mode = "fail_closed"
+    [openshell.gateway.credential_storage]
+    key_encryption_key_env = "OPENSHELL_GATEWAY_CREDENTIAL_KEY_ENCRYPTION_KEY"
+    [openshell.gateway.gateway_jwt]
+    gateway_id = "openshell"
+    kid_path = "/etc/openshell-jwt/kid"
+    public_key_path = "/etc/openshell-jwt/public.pem"
+    signing_key_path = "/etc/openshell-jwt/signing.pem"
+    ttl_secs = 3600
+    [openshell.gateway.tls]
+    cert_path = "/etc/openshell-tls/server/tls.crt"
+    client_ca_path = "/etc/openshell-tls/client-ca/ca.crt"
+    key_path = "/etc/openshell-tls/server/tls.key"

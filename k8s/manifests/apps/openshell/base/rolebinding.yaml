@@ -1,0 +1,51 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: openshell-peer
+  namespace: openshell
+  labels:
+    app.kubernetes.io/name: openshell
+    app.kubernetes.io/instance: openshell
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: openshell-peer
+subjects:
+  - kind: ServiceAccount
+    name: openshell
+    namespace: openshell
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: openshell-sandbox
+  namespace: openshell
+  labels:
+    app.kubernetes.io/name: openshell
+    app.kubernetes.io/instance: openshell
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: openshell-sandbox
+subjects:
+  - kind: ServiceAccount
+    name: openshell
+    namespace: openshell
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: openshell-certgen
+  namespace: openshell
+  labels:
+    app.kubernetes.io/name: openshell
+    app.kubernetes.io/instance: openshell
+  annotations:
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: openshell-certgen
+subjects:
+  - kind: ServiceAccount
+    name: openshell-certgen
+    namespace: openshell
