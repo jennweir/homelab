@@ -135,6 +135,7 @@ resource "google_project_iam_member" "gh_plan_iam" {
     for_each = toset([
         "roles/viewer",
         "roles/storage.objectViewer",
+        "roles/storage.admin",
     ])
     project = data.google_project.k8s_lab.project_id
     role    = each.value
