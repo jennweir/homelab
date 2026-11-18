@@ -1,4 +1,4 @@
-provider "google" {
-  project = "homelab-mgmt"
-  region  = "us-east1"
-}
+# provider "google" {
+#   project = "homelab-mgmt"
+#   region  = "us-east1"
+# }
