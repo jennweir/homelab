@@ -5,6 +5,10 @@ concurrency:
   cancel-in-progress: true
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "opentofu/**"
   pull_request:
     branches: [main]
     paths:
@@ -174,7 +178,7 @@ jobs:
   apply:
     name: Apply - ${{ matrix.dir }}
     needs: plan
-    if: github.event.action == 'closed' && github.event.pull_request.merged == true
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     strategy:
       matrix:
         include:
