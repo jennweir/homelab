@@ -98,7 +98,7 @@ resource "google_service_account_iam_member" "gh_plan_wif_binding" {
 resource "google_service_account_iam_member" "gh_apply_wif_binding" {
     service_account_id = google_service_account.gh_apply.name
     role               = "roles/iam.workloadIdentityUser"
-    member             = "principal://iam.googleapis.com/projects/${data.google_project.pi_cluster.number}/locations/global/workloadIdentityPools/${local.gh_pool}/subject/repo:jennweir/homelab:ref:refs/heads/main"
+    member             = "principal://iam.googleapis.com/projects/${data.google_project.pi_cluster.number}/locations/global/workloadIdentityPools/${local.gh_pool}/subject/repo:jennweir/homelab:environment:production"
 }
 
 resource "google_service_account" "gsm_accessor" {
@@ -112,4 +112,3 @@ resource "google_project_iam_member" "gsm_accessor_role" {
     role    = "roles/secretmanager.secretAccessor"
     member  = "serviceAccount:${google_service_account.gsm_accessor.email}"
 }
-
