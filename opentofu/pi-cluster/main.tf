@@ -25,13 +25,6 @@ resource "google_storage_bucket" "opentofu_backend" {
     }
 }
 
-# allow the k8s-lab plan service account to release state locks
-resource "google_storage_bucket_iam_member" "gh_plan_state_admin" {
-    bucket = "jennweir-terraform-backend"
-    role   = "roles/storage.objectAdmin"
-    member = "serviceAccount:${google_service_account.gh_plan.email}"
-}
-
 # GitHub Actions WIF pool and provider
 resource "google_iam_workload_identity_pool" "gh_pool" {
     project                   = data.google_project.pi_cluster.project_id
