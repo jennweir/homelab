@@ -46,13 +46,6 @@ resource "google_storage_bucket_iam_member" "homelab_bucket" {
     member = "allUsers"
 }
 
-# allow the k8s-lab plan service account to release state locks
-resource "google_storage_bucket_iam_member" "gh_plan_state_admin" {
-    bucket = "jennweir-terraform-backend"
-    role   = "roles/storage.objectAdmin"
-    member = "serviceAccount:${google_service_account.gh_plan.email}"
-}
-
 resource "google_storage_bucket" "opentofu_backend" {
     project     = data.google_project.k8s_lab.project_id
     name        = "opentofu-backend-k8s-lab"
@@ -135,6 +128,7 @@ resource "google_project_iam_member" "gh_plan_iam" {
     for_each = toset([
         "roles/viewer",
         "roles/storage.objectViewer",
+        "roles/storage.admin",
     ])
     project = data.google_project.k8s_lab.project_id
     role    = each.value
@@ -293,4 +287,3 @@ resource "google_service_account_iam_member" "cert_manager_wif_binding" {
 #         ]
 #     }
 # }
-
