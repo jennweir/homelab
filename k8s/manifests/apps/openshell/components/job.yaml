@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: openshell-certgen
+  namespace: openshell
+  labels:
+    app.kubernetes.io/name: openshell
+    app.kubernetes.io/instance: openshell
+  annotations:
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 150
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: certgen
+        app.kubernetes.io/instance: openshell
+        app.kubernetes.io/name: openshell-certgen
+    spec:
+      restartPolicy: OnFailure
+      serviceAccountName: openshell-certgen
+      containers:
+        - name: certgen
+          image: ghcr.io/nvidia/openshell/gateway:0.1.8@sha256:d66352a54c680b652e5ddd7d19b9c1189568d18016f360b9b8c64014f13d89c4
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          command:
+            - /usr/local/bin/openshell-gateway
+          args:
+            - generate-certs
+            - --server-secret-name=openshell-server-tls
+            - --client-secret-name=openshell-client-tls
+            - --jwt-secret-name=openshell-jwt-keys
+            - --server-san=openshell
+            - --server-san=openshell.openshell.svc
+            - --server-san=openshell.openshell.svc.cluster.local
+            - --server-san=localhost
+            - --server-san=openshell.localhost
+            - --server-san=*.openshell.localhost
+            - --server-san=host.docker.internal
+            - --server-san=host.containers.internal
+            - --server-san=127.0.0.1
