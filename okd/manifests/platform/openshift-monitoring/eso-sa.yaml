@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: external-secrets
+  namespace: openshift-monitoring
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"

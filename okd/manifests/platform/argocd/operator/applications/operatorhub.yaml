@@ -1,0 +1,21 @@
+kind: Application
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: operatorhub
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: operatorhub
+  project: default
+  source:
+    repoURL: https://github.com/jennweir/HomeLab.git
+    path: manifests/platform/operatorhub
+    targetRevision: main
+  syncPolicy:
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        maxDuration: 5m
+        factor: 2

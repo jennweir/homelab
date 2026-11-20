@@ -1,0 +1,21 @@
+kind: Application
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: openshift-monitoring
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshift-monitoring
+  project: default
+  source:
+    repoURL: https://github.com/jennweir/HomeLab.git
+    path: manifests/platform/openshift-monitoring
+    targetRevision: main
+  syncPolicy:
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        maxDuration: 5m
+        factor: 2

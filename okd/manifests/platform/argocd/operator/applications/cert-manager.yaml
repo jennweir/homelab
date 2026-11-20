@@ -1,0 +1,21 @@
+kind: Application
+apiVersion: argoproj.io/v1alpha1
+metadata:
+  name: cert-manager
+  namespace: argocd
+spec:
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cert-manager
+  project: default
+  source:
+    repoURL: https://github.com/jennweir/HomeLab.git
+    path: manifests/platform/cert-manager/overlays/okd
+    targetRevision: main
+  syncPolicy:
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        maxDuration: 5m
+        factor: 2
